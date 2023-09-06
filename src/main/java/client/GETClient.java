@@ -1,6 +1,6 @@
 package client;
 
-import clock.LambdaClock;
+import clock.LamportClock;
 import rest.Request;
 import rest.Response;
 
@@ -10,12 +10,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class GETClient {
-    LambdaClock clock;
+    LamportClock clock;
     final Socket socket;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
     public GETClient(String hostname, int port) throws IOException {
-        clock = new LambdaClock();
+        clock = new LamportClock();
         socket = new Socket(hostname, port);
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inStream = new ObjectInputStream(socket.getInputStream());

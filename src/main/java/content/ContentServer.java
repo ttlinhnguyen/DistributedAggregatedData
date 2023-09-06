@@ -1,6 +1,6 @@
 package content;
 
-import clock.LambdaClock;
+import clock.LamportClock;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rest.Request;
@@ -11,12 +11,12 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class ContentServer {
-    LambdaClock clock;
+    LamportClock clock;
     final Socket socket;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
     public ContentServer(String hostname, int port) throws IOException {
-        clock = new LambdaClock();
+        clock = new LamportClock();
         socket = new Socket(hostname, port);
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inStream = new ObjectInputStream(socket.getInputStream());

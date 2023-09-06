@@ -1,6 +1,6 @@
 package clock;
 
-public class LambdaClock {
+public class LamportClock {
     private int t = 0;
     public synchronized int get() {
         return t;

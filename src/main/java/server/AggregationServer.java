@@ -1,6 +1,6 @@
 package server;
 
-import clock.LambdaClock;
+import clock.LamportClock;
 import org.json.JSONArray;
 import rest.Request;
 import rest.Response;
@@ -10,16 +10,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.Timer;
 
 public class AggregationServer extends Thread {
-    LambdaClock clock;
+    LamportClock clock;
     final private ServerSocket server;
     private JSONArray data;
     public AggregationServer(int port) throws IOException {
-        clock = new LambdaClock();
+        clock = new LamportClock();
         server = new ServerSocket(port);
         data = new JSONArray();
     }
