@@ -15,6 +15,7 @@ public class Tests {
             JSONArray data1 = new JSONArray().put(content.readInput("src/main/java/content/data1.txt"));
             content.putData(data1);
             client.getData();
+            Thread.sleep(1000);
             content.putData(data1);
             client.getData();
         } catch (Exception e) {

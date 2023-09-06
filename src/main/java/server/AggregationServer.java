@@ -10,6 +10,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.util.Timer;
 
 public class AggregationServer extends Thread {
     LambdaClock clock;
@@ -27,14 +30,19 @@ public class AggregationServer extends Thread {
 
     @Override
     public void run() {
-        while (true) {
-            try {
+        try {
+            server.setSoTimeout(10 * 1000);
+            while (true) {
                 Socket client = server.accept();
                 Thread clientThread = new Thread(() -> handleClient(client));
                 clientThread.start();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+        } catch (SocketTimeoutException e) {
+            try {
+                server.close();
+            } catch (Exception err) {}
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
     private String getWeatherData() {
@@ -51,20 +59,27 @@ public class AggregationServer extends Thread {
 
     private void handleClient(Socket socket) {
         try {
+            socket.setSoTimeout(3 * 1000);
             ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
 
-            Request req = (Request) inStream.readObject();
-            if (req.method.equals("GET")) {
-                outStream.writeObject(new Response(200, clock.get(), getWeatherData()));
-            } else if (req.method.equals("PUT")) {
-                putWeatherData(req.body, req.clockTime);
-                outStream.writeObject(new Response(200, clock.get(), ""));
-            } else {
-                outStream.writeObject(new Response(500, clock.get(), ""));
+            while (true) {
+                Request req = (Request) inStream.readObject();
+                if (req.method.equals("GET")) {
+                    outStream.writeObject(new Response(200, clock.get(), getWeatherData()));
+                } else if (req.method.equals("PUT")) {
+                    putWeatherData(req.body, req.clockTime);
+                    outStream.writeObject(new Response(200, clock.get(), ""));
+                } else {
+                    outStream.writeObject(new Response(500, clock.get(), ""));
+                }
+                System.out.println("server clock " + clock.get());
             }
-            System.out.println("server clock " + clock.get());
-        } catch (Exception e) {
+        } catch (SocketTimeoutException e) {
+            try {
+                socket.close();
+            } catch (IOException errSocket) {}
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
