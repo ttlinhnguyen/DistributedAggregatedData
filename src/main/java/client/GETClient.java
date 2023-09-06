@@ -1,6 +1,8 @@
 package client;
 
 import clock.LamportClock;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import rest.Request;
 import rest.Response;
 
@@ -36,9 +38,19 @@ public class GETClient {
             Response res = (Response) inStream.readObject();
             clock.update(res.clockTime);
             System.out.println("GET " + res.status);
-            System.out.println(res.body);
+//            System.out.println(res.body);
+            displayData(new JSONArray(res.body));
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    private void displayData(JSONArray arr) {
+        for (int i=0; i<arr.length(); i++) {
+            JSONObject item = arr.getJSONObject(i);
+            for (String key : item.keySet()) {
+                System.out.format("%20s │ %s%n", key, item.get(key));
+            }
+            System.out.println();
         }
     }
     public static void main(String[] args) throws IOException {
