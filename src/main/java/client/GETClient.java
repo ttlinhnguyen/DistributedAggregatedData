@@ -14,12 +14,22 @@ public class GETClient {
     final Socket socket;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
+
+    /**
+     * Creates a GET client connected to a host with a specified port.
+     * @param hostname the hostname of the server
+     * @param port the port number of the server
+     */
     public GETClient(String hostname, int port) throws IOException {
         clock = new LamportClock();
         socket = new Socket(hostname, port);
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inStream = new ObjectInputStream(socket.getInputStream());
     }
+
+    /**
+     * Sends a GET request to the server to get the weather data and print out the response.
+     */
     public void getData() {
         try {
             outStream.writeObject(new Request("GET", clock.get(), null));

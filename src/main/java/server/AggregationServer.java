@@ -16,11 +16,19 @@ public class AggregationServer extends Thread {
     LamportClock clock;
     final private ServerSocket server;
     private JSONArray data;
+
+    /**
+     * Creates an Aggregation Server bound to a specified port.<br>
+     * The current maximum timeout for its server socket is 10 seconds
+     * and each client socket is 5 seconds.
+     * @param port the port number
+     */
     public AggregationServer(int port) throws IOException {
         clock = new LamportClock();
         server = new ServerSocket(port);
         data = new JSONArray();
     }
+
     public static void main(String[] args) throws IOException {
         AggregationServer server = new AggregationServer(4567);
         server.start();
@@ -43,10 +51,21 @@ public class AggregationServer extends Thread {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Returns the weather data stored in the server.
+     * @return the data to be returned
+    */
     private String getWeatherData() {
         clock.increment();
         return data.toString();
     }
+
+    /**
+     * Updates the weather data stored in the server.
+     * @param newData the new data to be added
+     * @param clockTime the LamportClock timestamp from the client
+     */
     private void putWeatherData(String newData, int clockTime) {
         clock.update(clockTime);
         JSONArray newArray = new JSONArray(newData);
@@ -55,6 +74,11 @@ public class AggregationServer extends Thread {
         }
     }
 
+    /**
+     * Listens to the client socket's input stream for requests
+     * and write the responses to the output stream.
+     * @param socket the client socket
+     */
     private void handleClient(Socket socket) {
         try {
             socket.setSoTimeout(3 * 1000);
