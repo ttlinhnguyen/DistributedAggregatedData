@@ -8,6 +8,7 @@ public class Tests {
         try {
             AggregationServer server = new AggregationServer(4567);
             server.start();
+            Thread.sleep(1000);
 
             ContentServer content = new ContentServer("localhost", 4567);
             GETClient client = new GETClient("localhost", 4567);
@@ -15,7 +16,7 @@ public class Tests {
             JSONArray data1 = new JSONArray().put(content.readInput("src/main/java/content/data1.txt"));
             content.putData(data1);
             client.getData();
-            Thread.sleep(1000);
+            Thread.sleep(500);
             content.putData(data1);
             client.getData();
         } catch (Exception e) {
