@@ -20,12 +20,12 @@ public class GETClient {
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inStream = new ObjectInputStream(socket.getInputStream());
     }
-    void getData() {
+    public void getData() {
         try {
-            outStream.writeObject(new Request("GET", clock.get(), ""));
+            outStream.writeObject(new Request("GET", clock.get(), null));
             Response res = (Response) inStream.readObject();
             clock.update(res.clockTime);
-            System.out.println(res.status);
+            System.out.println("GET " + res.status);
             System.out.println(res.body);
         } catch (Exception e) {
             e.printStackTrace();
