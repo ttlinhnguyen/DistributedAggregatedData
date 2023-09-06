@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Update request and response in content server">
-      <change afterPath="$PROJECT_DIR$/src/main/java/clock/LambdaClock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/AggregationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AggregationServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ContentServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ContentServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/GETClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GETClient.java" afterDir="false" />
+    <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Add Lambda clock">
+      <change beforePath="$PROJECT_DIR$/src/main/java/ContentServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/content/ContentServer.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +44,9 @@
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Libraries",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -72,7 +72,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1693986617400</updated>
-      <workItem from="1693986618436" duration="3694000" />
+      <workItem from="1693986618436" duration="4023000" />
     </task>
     <task id="LOCAL-00001" summary="Add server and get client">
       <option name="closed" value="true" />
@@ -98,7 +98,15 @@
       <option name="project" value="LOCAL" />
       <updated>1693989950256</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Add Lambda clock">
+      <option name="closed" value="true" />
+      <created>1693990405243</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1693990405243</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -108,7 +116,8 @@
     <MESSAGE value="Add server and get client" />
     <MESSAGE value="Add Response and Request" />
     <MESSAGE value="Update request and response in content server" />
-    <option name="LAST_COMMIT_MESSAGE" value="Update request and response in content server" />
+    <MESSAGE value="Add Lambda clock" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Lambda clock" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
