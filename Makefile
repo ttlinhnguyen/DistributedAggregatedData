@@ -1,5 +1,5 @@
 CLASSPATH := \
-.:./lib/json-20230618.jar:./out/classes:./out/test-classes
+.:./lib/json-20230618.jar:./target/classes:./target/test-classes
 
 TEST := src/test/java/Tests.java
 
@@ -17,13 +17,18 @@ run: compile build
 build:
 	java -cp $(CLASSPATH) Tests
 
-compile: compile_class compile_test
+compile: make_dir compile_class compile_test
+
+make_dir:
+	mkdir -p target
+	mkdir -p target/classes
+	mkdir -p target/test-classes
 
 compile_class:
-	javac -d ./out/classes/ -cp $(CLASSPATH) $(CLASSES)
+	javac -d ./target/classes/ -cp $(CLASSPATH) $(CLASSES)
 
 compile_test:
-	javac -d ./out/test-classes/ -cp $(CLASSPATH) $(TEST)
+	javac -d ./target/test-classes/ -cp $(CLASSPATH) $(TEST)
 
 clean:
 	rm *.class
