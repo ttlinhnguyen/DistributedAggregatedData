@@ -7,7 +7,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public class GETClient {
-    private Socket socket;
+    final Socket socket;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
     public GETClient(String hostname, int port) throws IOException {
@@ -19,7 +19,8 @@ public class GETClient {
         try {
             outStream.writeObject(new Request("GET", 0, ""));
             Response res = (Response) inStream.readObject();
-            System.out.println("Read " + res.status);
+            System.out.println(res.status);
+            System.out.println(res.body);
         } catch (Exception e) {
             e.printStackTrace();
         }
