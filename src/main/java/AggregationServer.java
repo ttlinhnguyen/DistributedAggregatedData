@@ -1,3 +1,6 @@
+import rest.Request;
+import rest.Response;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -6,7 +9,7 @@ import java.net.Socket;
 
 public class AggregationServer {
     private ServerSocket server;
-    AggregationServer(int port) throws IOException {
+    public AggregationServer(int port) throws IOException {
         server = new ServerSocket(port);
     }
     public static void main(String[] args) throws IOException {
@@ -35,9 +38,9 @@ public class AggregationServer {
         public void run() {
 //            while (true) {
                 try {
-                    Object o = inStream.readObject();
-                    System.out.println("Read " + o);
-                    outStream.writeObject("200");
+                    Request req = (Request) inStream.readObject();
+                    System.out.println("Read " + req.method);
+                    outStream.writeObject(new Response(200, 0, ""));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

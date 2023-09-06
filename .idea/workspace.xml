@@ -4,14 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/AggregationServer.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/GETClient.java" afterDir="false" />
+    <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Add server and get client">
+      <change afterPath="$PROJECT_DIR$/src/main/java/ContentServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/rest/Request.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/rest/Response.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/AggregationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AggregationServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/GETClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GETClient.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +42,7 @@
   "keyToString": {
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
@@ -52,6 +52,20 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="AggregationServer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="AggregationServer" />
+      <module name="DS-A2" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.AggregationServer" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -60,11 +74,34 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1693986617400</updated>
-      <workItem from="1693986618436" duration="1147000" />
+      <workItem from="1693986618436" duration="2340000" />
     </task>
+    <task id="LOCAL-00001" summary="Add server and get client">
+      <option name="closed" value="true" />
+      <created>1693987913987</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1693987913987</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add server and get client" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add server and get client" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="java-exception">
+          <properties class="java.io.EOFException" package="java.io" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
