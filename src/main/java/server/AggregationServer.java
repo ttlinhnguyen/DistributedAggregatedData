@@ -2,6 +2,7 @@ package server;
 
 import clock.LamportClock;
 import org.json.JSONArray;
+import org.json.JSONException;
 import rest.Request;
 import rest.Response;
 
@@ -63,12 +64,11 @@ public class AggregationServer extends Thread {
 
     /**
      * Updates the weather data stored in the server.
-     * @param newData the new data to be added
+     * @param newArray the new data to be added
      * @param clockTime the LamportClock timestamp from the client
      */
-    private void putWeatherData(String newData, int clockTime) {
+    private void putWeatherData(JSONArray newArray, int clockTime) {
         clock.update(clockTime);
-        JSONArray newArray = new JSONArray(newData);
         for (int i=0; i<newArray.length(); i++) {
             data.put(newArray.get(i));
         }
@@ -90,10 +90,18 @@ public class AggregationServer extends Thread {
                 if (req.method.equals("GET")) {
                     outStream.writeObject(new Response(200, clock.get(), getWeatherData()));
                 } else if (req.method.equals("PUT")) {
-                    putWeatherData(req.body, req.clockTime);
-                    outStream.writeObject(new Response(200, clock.get(), ""));
+                    try {
+                        JSONArray newArray = new JSONArray(req.body);
+                        if (newArray.isEmpty()) outStream.writeObject(new Response(204, clock.get(), ""));
+                        else {
+                            putWeatherData(newArray, req.clockTime);
+                            outStream.writeObject(new Response(200, clock.get(), ""));
+                        }
+                    } catch (JSONException e) {
+                        outStream.writeObject(new Response(500, clock.get(), ""));
+                    }
                 } else {
-                    outStream.writeObject(new Response(500, clock.get(), ""));
+                    outStream.writeObject(new Response(400, clock.get(), ""));
                 }
                 System.out.println("server clock " + clock.get());
             }
