@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Add Response and Request">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Update request and response in content server">
+      <change afterPath="$PROJECT_DIR$/src/main/java/clock/LambdaClock.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/AggregationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/AggregationServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ContentServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ContentServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/GETClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/GETClient.java" afterDir="false" />
@@ -72,7 +72,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1693986617400</updated>
-      <workItem from="1693986618436" duration="3188000" />
+      <workItem from="1693986618436" duration="3694000" />
     </task>
     <task id="LOCAL-00001" summary="Add server and get client">
       <option name="closed" value="true" />
@@ -90,7 +90,15 @@
       <option name="project" value="LOCAL" />
       <updated>1693989014315</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Update request and response in content server">
+      <option name="closed" value="true" />
+      <created>1693989950256</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1693989950256</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -99,7 +107,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add server and get client" />
     <MESSAGE value="Add Response and Request" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Response and Request" />
+    <MESSAGE value="Update request and response in content server" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update request and response in content server" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

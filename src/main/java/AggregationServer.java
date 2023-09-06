@@ -1,3 +1,4 @@
+import clock.LambdaClock;
 import rest.Request;
 import rest.Response;
 
@@ -8,9 +9,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class AggregationServer {
+    LambdaClock clock;
     final private ServerSocket server;
     private String data;
     public AggregationServer(int port) throws IOException {
+        clock = new LambdaClock();
         server = new ServerSocket(port);
         data = "";
     }
@@ -27,9 +30,11 @@ public class AggregationServer {
         }
     }
     private String getWeatherData() {
+        clock.increment();
         return data;
     }
-    private void putWeatherData(String newData) {
+    private void putWeatherData(String newData, int clockTime) {
+        clock.update(clockTime);
         data += newData;
     }
 
@@ -42,13 +47,14 @@ public class AggregationServer {
             System.out.println("Read " + req.method);
             System.out.println(req.body);
             if (req.method.equals("GET")) {
-                outStream.writeObject(new Response(200, 0, getWeatherData()));
+                outStream.writeObject(new Response(200, clock.get(), getWeatherData()));
             } else if (req.method.equals("PUT")) {
-                putWeatherData(req.body);
-                outStream.writeObject(new Response(200, 0, ""));
+                putWeatherData(req.body, req.clockTime);
+                outStream.writeObject(new Response(200, clock.get(), ""));
             } else {
-                outStream.writeObject(new Response(500, 0, ""));
+                outStream.writeObject(new Response(500, clock.get(), ""));
             }
+            System.out.println("clock " + clock.get());
         } catch (Exception e) {
             e.printStackTrace();
         }
