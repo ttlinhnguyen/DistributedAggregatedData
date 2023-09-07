@@ -53,8 +53,23 @@ public class GETClient {
             System.out.println();
         }
     }
+
+    /**
+     * It will take the URL to the server as an argument with the format of
+     * hostname:port.
+     * If not provided, it'll be set to localhost:4567
+     * @param args the server URL in the form of hostname:port
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-        GETClient client = new GETClient("localhost", 4567);
+        String hostname = "localhost";
+        int port = 4567;
+        if (args.length>0) {
+            String[] path = args[0].split(":", 2);
+            hostname = path[0];
+            port = Integer.parseInt(path[1]);
+        }
+        GETClient client = new GETClient(hostname, port);
         client.getData();
     }
 }

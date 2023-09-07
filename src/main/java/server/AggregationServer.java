@@ -30,8 +30,17 @@ public class AggregationServer extends Thread {
         data = new JSONArray();
     }
 
+    /**
+     * The command line arguments take one port number. If not provided, then the port
+     * will be set to 4567.
+     * @param args port number
+     * @throws IOException
+     */
     public static void main(String[] args) throws IOException {
-        AggregationServer server = new AggregationServer(4567);
+        int port = 4567;
+        if (args.length>0) port = Integer.parseInt(args[0]);
+        System.out.println(port);
+        AggregationServer server = new AggregationServer(port);
         server.start();
     }
 

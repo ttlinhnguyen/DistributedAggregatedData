@@ -30,5 +30,8 @@ compile_class:
 compile_test:
 	javac -d ./target/test-classes/ -cp $(CLASSPATH) $(TEST)
 
+server:
+	java -cp $(CLASSPATH) server.AggregationServer
+
 clean:
 	rm *.class
