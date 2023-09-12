@@ -9,10 +9,12 @@ import rest.Response;
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class ContentServer {
+    String id;
     LamportClock clock;
-    final Socket socket;
+    Socket socket;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
     /**
@@ -20,9 +22,21 @@ public class ContentServer {
      * @param hostname the hostname of the server
      * @param port the port number of the server
      */
-    public ContentServer(String hostname, int port) throws IOException {
+    public ContentServer(String hostname, int port) throws IOException, InterruptedException {
+        id = "Content-" + UUID.randomUUID();
         clock = new LamportClock();
-        socket = new Socket(hostname, port);
+
+        int connectTry = 0;
+        while (connectTry<=4) {
+            try {
+                if (connectTry!=0) Thread.sleep(1000);
+                socket = new Socket(hostname, port);
+                break;
+            } catch (Exception e) {
+                if (++connectTry==4) throw e;
+                else System.out.println("Cannot connect. Re-connecting...");
+            }
+        }
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inStream = new ObjectInputStream(socket.getInputStream());
     }
@@ -31,7 +45,7 @@ public class ContentServer {
      * Sends a PUT request to the server with the new data to be added.
      * @param data the data to be sent to the server
      */
-    public void putData(JSONArray data) {
+    public void putData(JSONObject data) {
         clock.increment();
         try {
             outStream.writeObject(new Request("PUT", clock.get(), data.toString()));
@@ -56,28 +70,30 @@ public class ContentServer {
             json.put(attr[0], attr[1]);
         }
         scanner.close();
+        json.put("id", id);
         return json;
     }
 
     /**
-     * It will take the URL to the server as an argument with the format of
-     * hostname:port.
-     * If not provided, it'll be set to localhost:4567
-     * @param args the server URL in the form of hostname:port
-     * @throws IOException
+     * It will take the URL to the server and the input path file as arguments.
+     * The format of the server URL is hostname:port.
+     * @param args the server URL in the form of hostname:port & the path to the input file
      */
-    public static void main(String[] args) throws IOException {
-        String hostname = "localhost";
-        int port = 4567;
-        if (args.length>0) {
+    public static void main(String[] args) {
+        try {
             String[] path = args[0].split(":", 2);
-            hostname = path[0];
-            port = Integer.parseInt(path[1]);
-        }
+            String hostname = path[0];
+            int port = Integer.parseInt(path[1]);
 
-        ContentServer client = new ContentServer(hostname, port);
-        JSONObject in = client.readInput("src/main/java/content/data1.txt");
-        JSONArray data = new JSONArray().put(in);
-        client.putData(data);
+            String inputFilePath = args[1]; // example: src/main/java/content/data1.txt
+
+            ContentServer client = new ContentServer(hostname, port);
+            JSONObject data = client.readInput(inputFilePath);
+            client.putData(data);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("ERROR: Bad arguments.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

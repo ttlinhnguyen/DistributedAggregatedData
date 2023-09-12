@@ -12,10 +12,19 @@ CLASSES := client/*.java \
 
 CLASSES := $(foreach c, $(CLASSES), src/main/java/$(c))
 
-run: compile build
+run: compile tests
 
-build:
+tests:
 	java -cp $(CLASSPATH) Tests
+
+server:
+	java -cp $(CLASSPATH) server.AggregationServer
+
+client:
+	java -cp $(CLASSPATH) client.GETClient localhost:4567
+
+content:
+	java -cp $(CLASSPATH) content.ContentServer localhost:4567 src/main/java/content/data1.txt
 
 compile: make_dir compile_class compile_test
 
@@ -30,8 +39,6 @@ compile_class:
 compile_test:
 	javac -d ./target/test-classes/ -cp $(CLASSPATH) $(TEST)
 
-server:
-	java -cp $(CLASSPATH) server.AggregationServer
 
 clean:
 	rm *.class

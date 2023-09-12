@@ -10,10 +10,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Iterator;
 
 public class GETClient {
     LamportClock clock;
-    final Socket socket;
+    Socket socket;
     ObjectOutputStream outStream;
     ObjectInputStream inStream;
 
@@ -22,9 +23,20 @@ public class GETClient {
      * @param hostname the hostname of the server
      * @param port the port number of the server
      */
-    public GETClient(String hostname, int port) throws IOException {
+    public GETClient(String hostname, int port) throws IOException, InterruptedException {
         clock = new LamportClock();
-        socket = new Socket(hostname, port);
+
+        int connectTry = 0;
+        while (connectTry<=4) {
+            try {
+                if (connectTry!=0) Thread.sleep(1000);
+                socket = new Socket(hostname, port);
+                break;
+            } catch (Exception e) {
+                if (++connectTry==4) throw e;
+                else System.out.println("Cannot connect. Re-connecting...");
+            }
+        }
         outStream = new ObjectOutputStream(socket.getOutputStream());
         inStream = new ObjectInputStream(socket.getInputStream());
     }
@@ -39,16 +51,21 @@ public class GETClient {
             clock.update(res.clockTime);
             System.out.println("GET " + res.status);
 //            System.out.println(res.body);
-            displayData(new JSONArray(res.body));
+
+            displayData(new JSONObject(res.body));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-    private void displayData(JSONArray arr) {
-        for (int i=0; i<arr.length(); i++) {
-            JSONObject item = arr.getJSONObject(i);
-            for (String key : item.keySet()) {
-                System.out.format("%20s │ %s%n", key, item.get(key));
+    private void displayData(JSONObject obj) {
+        Iterator<String> it = obj.keys();
+        while (it.hasNext()) {
+            JSONArray arr = obj.getJSONArray(it.next());
+            for (int i=0; i< arr.length(); i++) {
+                JSONObject item = arr.getJSONObject(i);
+                for (String key : item.keySet()) {
+                    System.out.format("%20s │ %s%n", key, item.get(key));
+                }
             }
             System.out.println();
         }
@@ -57,19 +74,19 @@ public class GETClient {
     /**
      * It will take the URL to the server as an argument with the format of
      * hostname:port.
-     * If not provided, it'll be set to localhost:4567
      * @param args the server URL in the form of hostname:port
-     * @throws IOException
      */
-    public static void main(String[] args) throws IOException {
-        String hostname = "localhost";
-        int port = 4567;
-        if (args.length>0) {
+    public static void main(String[] args) {
+        try {
             String[] path = args[0].split(":", 2);
-            hostname = path[0];
-            port = Integer.parseInt(path[1]);
+            String hostname = path[0];
+            int port = Integer.parseInt(path[1]);
+            GETClient client = new GETClient(hostname, port);
+            client.getData();
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println("ERROR: Bad arguments.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        GETClient client = new GETClient(hostname, port);
-        client.getData();
     }
 }

@@ -3,20 +3,34 @@ package server;
 import clock.LamportClock;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import rest.Request;
 import rest.Response;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.LinkedList;
+import java.util.Scanner;
+import java.util.UUID;
 
 public class AggregationServer extends Thread {
+    String dbPath;
     LamportClock clock;
     final private ServerSocket server;
-    private JSONArray data;
+    private JSONObject data;
+    LinkedList<RequestNode> queue;
+    public static class RequestNode {
+        String clientId;
+        public ObjectOutputStream out;
+        public Request request;
+        public RequestNode(String clientId, ObjectOutputStream out, Request req) {
+            this.clientId = clientId;
+            this.out = out;
+            this.request = req;
+        }
+    };
 
     /**
      * Creates an Aggregation Server bound to a specified port.<br>
@@ -26,26 +40,32 @@ public class AggregationServer extends Thread {
      */
     public AggregationServer(int port) throws IOException {
         clock = new LamportClock();
+        queue = new LinkedList<>();
         server = new ServerSocket(port);
-        data = new JSONArray();
+        dbPath = "src/main/java/server/weather.json";
+
+        updateLocalData();
     }
 
     /**
      * The command line arguments take one port number. If not provided, then the port
      * will be set to 4567.
      * @param args port number
-     * @throws IOException
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         int port = 4567;
         if (args.length>0) port = Integer.parseInt(args[0]);
-        System.out.println(port);
-        AggregationServer server = new AggregationServer(port);
-        server.start();
+        System.out.println("Server is connected to port " + port);
+        try {
+            AggregationServer server = new AggregationServer(port);
+            server.start();
+        } catch (Exception e) {}
     }
 
     @Override
     public void run() {
+        Thread requestThread = new Thread(this::handleRequest);
+        requestThread.start();
         try {
             server.setSoTimeout(10 * 1000);
             while (true) {
@@ -55,13 +75,48 @@ public class AggregationServer extends Thread {
             }
         } catch (SocketTimeoutException e) {
             try {
+                System.out.println("Server is closing");
                 server.close();
+                requestThread.stop();
             } catch (Exception err) {}
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void handleRequest() {
+        while (true) {
+            try {
+                if (!queue.isEmpty()) {
+                    RequestNode reqNode = queue.poll();
+                    ObjectOutputStream outStream = reqNode.out;
+                    Request req = reqNode.request;
+                    Response res;
+                    if (req.method.equals("GET")) {
+                        String data = getWeatherData();
+                        res = new Response(200, clock.get(), data);
+                    } else if (req.method.equals("PUT")) {
+                        if (req.body.isEmpty()) res = new Response(204, clock.get(), null);
+                        else {
+                            try {
+                                JSONObject newObj = new JSONObject(req.body);
+//                                clientId = newObj.getString("id");
+                                putWeatherData(reqNode.clientId, newObj, req.clockTime);
+                                res = new Response(200, clock.get(), null);
+                            } catch (JSONException e) {
+                                res = new Response(500, clock.get(), null);
+                            }
+                        }
+                    } else res = new Response(400, clock.get(), null);
+
+                    outStream.writeObject(res);
+                    System.out.println("server clock " + clock.get());
+                } else Thread.sleep(500);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
     /**
      * Returns the weather data stored in the server.
      * @return the data to be returned
@@ -73,13 +128,48 @@ public class AggregationServer extends Thread {
 
     /**
      * Updates the weather data stored in the server.
-     * @param newArray the new data to be added
+     * @param obj the new data to be added
      * @param clockTime the LamportClock timestamp from the client
      */
-    private void putWeatherData(JSONArray newArray, int clockTime) {
+    private void putWeatherData(String clientId, JSONObject obj, int clockTime) {
         clock.update(clockTime);
-        for (int i=0; i<newArray.length(); i++) {
-            data.put(newArray.get(i));
+        if (!data.has(clientId)) data.put(clientId, new JSONArray());
+        data.getJSONArray(clientId).put(obj);
+        updateDbFile();
+    }
+
+    private void removeWeatherData(String id) {
+        if (!id.isEmpty() && data.has(id)) {
+            data.remove(id);
+            updateDbFile();
+        }
+    }
+
+    private void updateDbFile() {
+        try {
+            FileWriter writer = new FileWriter(dbPath);
+            writer.write(data.toString());
+            writer.flush();
+            writer.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateLocalData() {
+        try {
+            File db = new File(dbPath);
+            db.createNewFile();
+            Scanner scanner = new Scanner(db);
+            String dbText = "";
+            if (scanner.hasNextLine()) {
+                dbText += scanner.nextLine();
+            }
+            scanner.close();
+            if (dbText.isEmpty()) data = new JSONObject();
+            else data = new JSONObject(dbText);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -90,36 +180,33 @@ public class AggregationServer extends Thread {
      */
     private void handleClient(Socket socket) {
         try {
-            socket.setSoTimeout(3 * 1000);
+            boolean isContent = false;
+            String clientId = UUID.randomUUID().toString();
+            long start = System.currentTimeMillis();
             ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream());
             ObjectInputStream inStream = new ObjectInputStream(socket.getInputStream());
 
-            while (true) {
-                Request req = (Request) inStream.readObject();
-                if (req.method.equals("GET")) {
-                    outStream.writeObject(new Response(200, clock.get(), getWeatherData()));
-                } else if (req.method.equals("PUT")) {
-                    try {
-                        JSONArray newArray = new JSONArray(req.body);
-                        if (newArray.isEmpty()) outStream.writeObject(new Response(204, clock.get(), ""));
-                        else {
-                            putWeatherData(newArray, req.clockTime);
-                            outStream.writeObject(new Response(200, clock.get(), ""));
-                        }
-                    } catch (JSONException e) {
-                        outStream.writeObject(new Response(500, clock.get(), ""));
+            while (System.currentTimeMillis() < start + 3 * 1000) {
+                try {
+                    Request req = (Request) inStream.readObject();
+                    start = System.currentTimeMillis();
+                    if (req.method.equals("PUT")) isContent = true;
+                    synchronized (this) {
+                        RequestNode reqNode = new RequestNode(clientId, outStream, req);
+                        queue.add(reqNode);
                     }
-                } else {
-                    outStream.writeObject(new Response(400, clock.get(), ""));
-                }
-                System.out.println("server clock " + clock.get());
+                } catch (Exception e) {}
             }
-        } catch (SocketTimeoutException e) {
-            try {
-                socket.close();
-            } catch (IOException errSocket) {}
-        } catch (IOException | ClassNotFoundException e) {
+            socket.close();
+            if (isContent) {
+                removeWeatherData(clientId);
+                System.out.println("Server removed content from " + clientId);
+            }
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
 }
+
+
