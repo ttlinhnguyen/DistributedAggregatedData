@@ -2,20 +2,17 @@ package server;
 
 import rest.Request;
 
-import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.UUID;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class ClientHandler implements Runnable{
     private Socket socket;
-    private LinkedBlockingQueue<RequestNode> queue;
+    private PriorityBlockingQueue<RequestNode> requestQueue;
 
     public ClientHandler(Socket socket, Listener listener) {
         this.socket = socket;
-        this.queue = listener.getQueue();
+        this.requestQueue = listener.getRequestQueue();
     }
 
     @Override
@@ -23,13 +20,12 @@ public class ClientHandler implements Runnable{
         ObjectInputStream inputStream;
         try {
             inputStream = new ObjectInputStream(socket.getInputStream());
-            try {
-                Request req = (Request) inputStream.readObject();
-                RequestNode reqNode = new RequestNode(socket, req);
-                queue.add(reqNode);
-            } catch (Exception e) {}
-        } catch (IOException e) {
+            Request req = (Request) inputStream.readObject();
+            RequestNode reqNode = new RequestNode(socket, req);
+            requestQueue.add(reqNode);
+        } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 }

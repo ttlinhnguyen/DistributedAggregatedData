@@ -7,9 +7,8 @@ import rest.Request;
 import rest.Response;
 
 import java.io.ObjectOutputStream;
-import java.net.Socket;
 
-class RequestHandler implements Runnable {
+class RequestHandler {
     private AggregationServer server;
     private RequestNode reqNode;
 
@@ -17,14 +16,14 @@ class RequestHandler implements Runnable {
         this.server = server;
         this.reqNode = reqNode;
     }
-    @Override
+//    @Override
     public void run() {
         try {
-                ObjectOutputStream outStream = new ObjectOutputStream(reqNode.socket.getOutputStream());
-                Response res = getResponse(reqNode);
+            ObjectOutputStream outStream = new ObjectOutputStream(reqNode.socket.getOutputStream());
+            Response res = getResponse(reqNode);
 
-                outStream.writeObject(res); // send response
-                System.out.println("server clock " + server.clock.get());
+            outStream.writeObject(res); // send response
+            System.out.println("server clock " + server.clock.get());
         } catch (Exception e) {
             e.printStackTrace();
         }

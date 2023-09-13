@@ -32,12 +32,23 @@ public abstract class AbstractClient {
     }
 
     protected void sendRequest(Request req) throws IOException {
+        clock.increment();
         outStream = new ObjectOutputStream(socket.getOutputStream());
         outStream.writeObject(req);
     }
 
     protected Response getResponse() throws IOException, ClassNotFoundException {
         inStream = new ObjectInputStream(socket.getInputStream());
-        return (Response) inStream.readObject();
+        Response res = (Response) inStream.readObject();
+        clock.update(res.clockTime);
+        return res;
+    }
+
+    public void stop() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

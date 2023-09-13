@@ -5,7 +5,8 @@ TEST := src/test/java/Tests.java
 
 CLASSES := client/*.java \
 	clock/*.java \
-	content/*.java \
+	client/content/*.java \
+	client/getclient/*.java \
 	server/*.java \
 	rest/*.java \
 	rest/*.java
@@ -21,10 +22,10 @@ server:
 	java -cp $(CLASSPATH) server.AggregationServer
 
 client:
-	java -cp $(CLASSPATH) client.GETClient localhost:4567
+	java -cp $(CLASSPATH) client.getclient.GETClient localhost:4567
 
 content:
-	java -cp $(CLASSPATH) content.ContentServer localhost:4567 src/main/java/content/data1.txt
+	java -cp $(CLASSPATH) client.content.ContentServer localhost:4567 src/main/java/client/content/data1.txt
 
 compile: make_dir compile_class compile_test
 

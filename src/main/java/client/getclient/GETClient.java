@@ -33,9 +33,7 @@ public class GETClient extends AbstractClient implements Runnable {
             sendRequest(new Request("GET", clock.get(), null));
 
             Response res = getResponse();
-            clock.update(res.clockTime);
             System.out.println("GET " + res.status);
-
             displayData(new JSONObject(res.body));
         } catch (Exception e) {
             e.printStackTrace();

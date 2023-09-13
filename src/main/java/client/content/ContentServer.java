@@ -31,11 +31,12 @@ public class ContentServer extends AbstractClient implements Runnable {
      * Sends a PUT request to the server with the new data to be added.
      */
     public void putData() {
-        clock.increment();
         try {
+
             sendRequest(new Request("PUT", clock.get(), input.toString()));
             Response res = getResponse();
             System.out.println("PUT " + res.status);
+
         } catch (Exception e) {
             e.printStackTrace();
         }

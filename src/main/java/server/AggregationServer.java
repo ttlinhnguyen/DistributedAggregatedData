@@ -6,8 +6,8 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.ServerSocket;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.Scanner;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class AggregationServer implements Runnable {
     private boolean running = true;
@@ -15,7 +15,9 @@ public class AggregationServer implements Runnable {
     LamportClock clock;
     final ServerSocket server;
     private JSONObject data;
-    private LinkedBlockingQueue<RequestNode> queue;
+    private PriorityBlockingQueue<RequestNode> requestQueue;
+//    private PriorityBlockingQueue<ResponseNode> responseQueue;
+
     private Listener listener;
 
     /**
@@ -26,7 +28,8 @@ public class AggregationServer implements Runnable {
      */
     public AggregationServer(int port) throws IOException {
         clock = new LamportClock();
-        queue = new LinkedBlockingQueue<>();
+        requestQueue = new PriorityBlockingQueue<>(11, new RequestComparator());
+//        responseQueue = new PriorityBlockingQueue<>(11, new ResponseComparator());
         server = new ServerSocket(port);
         dbPath = "src/main/java/server/weather.json";
 
@@ -54,11 +57,12 @@ public class AggregationServer implements Runnable {
         System.out.println("starting server");
         startListener();
         while (running) {
-            if (!queue.isEmpty()) startHandlingRequest(queue.poll());
+            if (!requestQueue.isEmpty()) startHandlingRequest(requestQueue.poll());
         }
     }
     public void stop() {
         listener.stop();
+        running = false;
     }
 
     private void startListener() {
@@ -68,8 +72,8 @@ public class AggregationServer implements Runnable {
     }
 
     private void startHandlingRequest(RequestNode reqNode) {
-        Thread t = new Thread(new RequestHandler(reqNode, this));
-        t.start();
+        RequestHandler handler = new RequestHandler(reqNode, this);
+        handler.run();
     }
 
     public String getWeatherData() {
@@ -83,8 +87,8 @@ public class AggregationServer implements Runnable {
      * @param clockTime the LamportClock timestamp from the client
      */
     public void putWeatherData(JSONObject obj, int clockTime) {
-        String clientId = obj.getString("id");
         clock.update(clockTime);
+        String clientId = obj.getString("id");
         if (!data.has(clientId)) data.put(clientId, new JSONArray());
         data.getJSONArray(clientId).put(obj);
         updateDbFile();
@@ -125,7 +129,7 @@ public class AggregationServer implements Runnable {
         }
     }
 
-    public LinkedBlockingQueue<RequestNode> getQueue() { return queue; }
+    public PriorityBlockingQueue<RequestNode> getRequestQueue() { return requestQueue; }
     public ServerSocket getServerSocket() { return server; }
     public boolean isRunning() { return running; }
 }
