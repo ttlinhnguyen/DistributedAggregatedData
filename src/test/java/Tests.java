@@ -1,42 +1,32 @@
-import client.GETClient;
-import content.ContentServer;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import client.getclient.GETClient;
+import client.content.ContentServer;
 import server.AggregationServer;
+
+import static java.lang.Thread.sleep;
 
 public class Tests {
     private void test1() {
         try {
             AggregationServer server = new AggregationServer(4567);
-            server.start();
-            Thread.sleep(1000);
+            Thread tServer = new Thread(server);
+            tServer.start();
 
-            ContentServer content = new ContentServer("localhost", 4567);
             GETClient client = new GETClient("localhost", 4567);
-            JSONObject data1 = content.readInput("src/main/java/content/data1.txt");
-            JSONObject data2 = content.readInput("src/main/java/content/data2.txt");
+            ContentServer content = new ContentServer("localhost", 4567);
+            content.readInput("src/main/java/client/content/data1.txt");
 
-            Thread clientThread1 = new Thread(client::getData);
-            Thread clientThread2 = new Thread(client::getData);
-            Thread contentThread1 = new Thread(() -> content.putData(data1));
-            Thread contentThread2 = new Thread(() -> content.putData(data2));
+            Thread tContent = new Thread(content);
+            Thread tClient = new Thread(client);
 
-            contentThread1.start();
-            clientThread1.start();
+            sleep(100);
+            tContent.start();
+            tClient.start();
 
-            Thread.sleep(500);
-            contentThread2.start();
-            clientThread2.start();
-//            content.putData(data1);
-//            client.getData();
-//            Thread.sleep(500);
-//            content.putData(data1);
-//            client.getData();
+            server.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
     public static void main(String[] args) {
         Tests tests = new Tests();
         tests.test1();

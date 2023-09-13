@@ -1,22 +1,15 @@
-package client;
+package client.getclient;
 
-import clock.LamportClock;
+import client.AbstractClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import rest.Request;
 import rest.Response;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.Iterator;
 
-public class GETClient {
-    LamportClock clock;
-    Socket socket;
-    ObjectOutputStream outStream;
-    ObjectInputStream inStream;
+public class GETClient extends AbstractClient implements Runnable {
 
     /**
      * Creates a GET client connected to a host with a specified port.
@@ -24,21 +17,12 @@ public class GETClient {
      * @param port the port number of the server
      */
     public GETClient(String hostname, int port) throws IOException, InterruptedException {
-        clock = new LamportClock();
+        super(hostname, port);
+    }
 
-        int connectTry = 0;
-        while (connectTry<=4) {
-            try {
-                if (connectTry!=0) Thread.sleep(1000);
-                socket = new Socket(hostname, port);
-                break;
-            } catch (Exception e) {
-                if (++connectTry==4) throw e;
-                else System.out.println("Cannot connect. Re-connecting...");
-            }
-        }
-        outStream = new ObjectOutputStream(socket.getOutputStream());
-        inStream = new ObjectInputStream(socket.getInputStream());
+    @Override
+    public void run() {
+        getData();
     }
 
     /**
@@ -46,11 +30,11 @@ public class GETClient {
      */
     public void getData() {
         try {
-            outStream.writeObject(new Request("GET", clock.get(), null));
-            Response res = (Response) inStream.readObject();
+            sendRequest(new Request("GET", clock.get(), null));
+
+            Response res = getResponse();
             clock.update(res.clockTime);
             System.out.println("GET " + res.status);
-//            System.out.println(res.body);
 
             displayData(new JSONObject(res.body));
         } catch (Exception e) {
@@ -81,8 +65,8 @@ public class GETClient {
             String[] path = args[0].split(":", 2);
             String hostname = path[0];
             int port = Integer.parseInt(path[1]);
-            GETClient client = new GETClient(hostname, port);
-            client.getData();
+            Thread client = new Thread(new GETClient(hostname, port));
+            client.start();
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println("ERROR: Bad arguments.");
         } catch (Exception e) {
