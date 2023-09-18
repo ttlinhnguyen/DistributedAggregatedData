@@ -11,9 +11,11 @@ import java.io.ObjectOutputStream;
 class RequestHandler {
     private AggregationServer server;
     private RequestNode reqNode;
+    private Storage storage;
 
     public RequestHandler(RequestNode reqNode, AggregationServer server) {
         this.server = server;
+        this.storage = server.getStorage();
         this.reqNode = reqNode;
     }
 //    @Override
@@ -33,14 +35,14 @@ class RequestHandler {
         Request req = reqNode.request;
         Response res;
         if (req.method.equals("GET")) {
-            String data = server.getWeatherData();
+            String data = storage.getWeatherData();
             res = new Response(200, server.clock.get(), data);
         } else if (req.method.equals("PUT")) {
             if (req.body.isEmpty()) res = new Response(204, server.clock.get(), null);
             else {
                 try {
                     JSONObject newObj = new JSONObject(req.body);
-                    server.putWeatherData(newObj, req.clockTime);
+                    storage.putWeatherData(newObj, req.clockTime);
                     res = new Response(200, server.clock.get(), null);
                 } catch (JSONException e) {
                     res = new Response(500, server.clock.get(), null);

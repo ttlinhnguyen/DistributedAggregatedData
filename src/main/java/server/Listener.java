@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class Listener implements Runnable {
+class Listener implements Runnable {
     private boolean running;
     private ServerSocket server;
     private PriorityBlockingQueue<RequestNode> requestQueue;

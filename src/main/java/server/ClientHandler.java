@@ -6,7 +6,7 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class ClientHandler implements Runnable{
+class ClientHandler implements Runnable{
     private Socket socket;
     private PriorityBlockingQueue<RequestNode> requestQueue;
 
