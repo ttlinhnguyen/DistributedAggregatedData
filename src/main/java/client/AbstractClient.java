@@ -1,6 +1,7 @@
 package client;
 
 import clock.LamportClock;
+import rest.HttpParser;
 import rest.Request;
 import rest.Response;
 
@@ -10,12 +11,14 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 public abstract class AbstractClient {
+    private HttpParser httpParser;
     protected LamportClock clock;
     protected Socket socket;
     protected ObjectOutputStream outStream;
     protected ObjectInputStream inStream;
 
     public AbstractClient(String hostname, int port) throws IOException, InterruptedException {
+        httpParser = new HttpParser();
         clock = new LamportClock();
 
         int connectTry = 0;
@@ -33,14 +36,17 @@ public abstract class AbstractClient {
 
     protected void sendRequest(Request req) throws IOException {
         clock.increment();
+        String reqHttpString = httpParser.createRequest(req);
+        System.out.println(reqHttpString);
         outStream = new ObjectOutputStream(socket.getOutputStream());
-        outStream.writeObject(req);
+        outStream.writeObject(reqHttpString);
     }
 
     protected Response getResponse() throws IOException, ClassNotFoundException {
         inStream = new ObjectInputStream(socket.getInputStream());
-        Response res = (Response) inStream.readObject();
-        clock.update(res.clockTime);
+        String resHttpString = (String) inStream.readObject();
+        Response res = httpParser.parseResponse(resHttpString);
+        clock.update(Integer.parseInt(res.headers.get("Server-Timing")));
         return res;
     }
 

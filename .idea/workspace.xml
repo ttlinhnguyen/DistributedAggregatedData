@@ -5,14 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Add Lambda clock">
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/Storage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/rest/HttpParser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/rest/Messages.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/AggregationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/AggregationServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/client/AbstractClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/AbstractClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/client/content/ContentServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/content/ContentServer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/client/getclient/GETClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/getclient/GETClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/rest/Request.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/rest/Request.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/rest/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/rest/Response.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/ClientHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/Listener.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/RequestHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/RequestHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/RequestNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/RequestNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/ResponseNode.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/weather.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/weather.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,12 +26,17 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
+        <option value="HTTP Request" />
+        <option value="HTTP Public Environment File" />
         <option value="Class" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
@@ -88,7 +97,7 @@
       <option name="presentableId" value="Default" />
       <updated>1693986617400</updated>
       <workItem from="1693986618436" duration="37611000" />
-      <workItem from="1694483464862" duration="49171000" />
+      <workItem from="1694483464862" duration="56719000" />
     </task>
     <task id="LOCAL-00001" summary="Add server and get client">
       <option name="closed" value="true" />

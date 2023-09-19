@@ -6,6 +6,7 @@ import rest.Request;
 import rest.Response;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -32,8 +33,15 @@ public class ContentServer extends AbstractClient implements Runnable {
      */
     public void putData() {
         try {
+            String body = input.toString();
+            Request req = new Request("PUT");
+            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+            req.addHeader("User-Agent", getClass().getSimpleName());
+            req.addHeader("Server-Timing", Integer.toString(clock.get()));
+            req.addHeader("Content-Length", Integer.toString(body.length()));
+            req.setBody(body);
 
-            sendRequest(new Request("PUT", clock.get(), input.toString()));
+            sendRequest(req);
             Response res = getResponse();
             System.out.println("PUT " + res.status);
 

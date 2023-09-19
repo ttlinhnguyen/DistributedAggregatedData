@@ -7,6 +7,7 @@ import rest.Request;
 import rest.Response;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Iterator;
 
 public class GETClient extends AbstractClient implements Runnable {
@@ -30,7 +31,12 @@ public class GETClient extends AbstractClient implements Runnable {
      */
     public void getData() {
         try {
-            sendRequest(new Request("GET", clock.get(), null));
+            Request req = new Request("GET");
+            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+            req.addHeader("User-Agent", getClass().getSimpleName());
+            req.addHeader("Accept", "application/json");
+            req.addHeader("Server-Timing", Integer.toString(clock.get()));
+            sendRequest(req);
 
             Response res = getResponse();
             System.out.println("GET " + res.status);
