@@ -23,27 +23,35 @@ public class GETClient extends AbstractClient implements Runnable {
 
     @Override
     public void run() {
-        getData();
+        try {
+            connect();
+            try {
+                Request req = createRequest();
+                sendRequest(req);
+                showResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {}
+    }
+
+    public Request createRequest() throws IOException {
+        Request req = new Request("GET");
+        req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+        req.addHeader("User-Agent", getClass().getSimpleName());
+        req.addHeader("Accept", "application/json");
+        req.addHeader("Server-Timing", Integer.toString(clock.get()));
+        req.setBody("");
+        return req;
     }
 
     /**
      * Sends a GET request to the server to get the weather data and print out the response.
      */
-    public void getData() {
-        try {
-            Request req = new Request("GET");
-            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
-            req.addHeader("User-Agent", getClass().getSimpleName());
-            req.addHeader("Accept", "application/json");
-            req.addHeader("Server-Timing", Integer.toString(clock.get()));
-            sendRequest(req);
-
+    public void showResponse() throws IOException, ClassNotFoundException {
             Response res = getResponse();
             System.out.println("GET " + res.status);
             displayData(new JSONObject(res.body));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
     private void displayData(JSONObject obj) {
         Iterator<String> it = obj.keys();

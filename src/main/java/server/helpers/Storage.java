@@ -1,19 +1,20 @@
-package server;
+package server.helpers;
 
 import clock.LamportClock;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import server.AggregationServer;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.util.Scanner;
 
-class Storage {
+public class Storage {
     String dbPath;
     private JSONObject data;
     private LamportClock clock;
     public Storage(AggregationServer server, String filename) {
-        this.clock = server.clock;
+        this.clock = server.getClock();
         this.dbPath = filename;
 
         updateLocalData();
@@ -37,10 +38,11 @@ class Storage {
         updateDbFile();
     }
 
-    private void removeWeatherData(String id) {
-        if (!id.isEmpty() && data.has(id)) {
+    public void removeWeatherData(String id) {
+        if (id!=null && data.has(id)) {
             data.remove(id);
             updateDbFile();
+            System.out.println("Delete content from " + id);
         }
     }
 

@@ -1,4 +1,4 @@
-package server;
+package server.helpers;
 
 
 import org.json.JSONException;
@@ -6,10 +6,11 @@ import org.json.JSONObject;
 import rest.HttpParser;
 import rest.Request;
 import rest.Response;
+import server.AggregationServer;
 
 import java.io.ObjectOutputStream;
 
-class RequestHandler {
+public class RequestHandler {
     private HttpParser httpParser;
     private AggregationServer server;
     private RequestNode reqNode;
@@ -21,14 +22,13 @@ class RequestHandler {
         this.reqNode = reqNode;
         httpParser = new HttpParser();
     }
-//    @Override
     public void run() {
         try {
             ObjectOutputStream outStream = new ObjectOutputStream(reqNode.socket.getOutputStream());
             Response res = getResponse(reqNode);
             String resHttpString = httpParser.createResponse(res);
             outStream.writeObject(resHttpString); // send response
-            System.out.println("server clock " + server.clock.get());
+            System.out.println("server clock " + server.getClock().get());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -55,7 +55,7 @@ class RequestHandler {
             }
         } else res.setStatus(400);
 
-        res.addHeader("Server-Timing", Integer.toString(server.clock.get()));
+        res.addHeader("Server-Timing", Integer.toString(server.getClock().get()));
 
         return res;
     }

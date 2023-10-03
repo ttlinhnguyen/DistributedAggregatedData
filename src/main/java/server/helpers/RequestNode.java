@@ -1,12 +1,11 @@
-package server;
+package server.helpers;
 
 
 import rest.Request;
 
 import java.net.Socket;
-import java.util.Comparator;
 
-class RequestNode {
+public class RequestNode {
     private static long priority = 0;
     public Socket socket;
     public Request request;
@@ -18,8 +17,3 @@ class RequestNode {
     public long getPriority() { return priority; }
 }
 
-class RequestComparator implements Comparator<RequestNode> {
-    public int compare(RequestNode n1, RequestNode n2) {
-        return Long.compare(n1.getPriority(), n2.getPriority());
-    }
-}

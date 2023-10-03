@@ -3,7 +3,7 @@ package rest;
 import java.util.Scanner;
 
 public class HttpParser {
-    public String createRequest(Request request) {
+    static public String createRequest(Request request) {
         StringBuilder result = new StringBuilder();
         result.append(request.method).append(" /weather.json HTTP/1.1\n");
 
@@ -13,7 +13,7 @@ public class HttpParser {
         result.append("\n").append(request.body);
         return result.toString();
     }
-    public Request parseRequest(String request) {
+    static public Request parseRequest(String request) {
         Scanner scanner = new Scanner(request);
         if (scanner.hasNextLine()) {
             String startLine = scanner.nextLine();
@@ -52,7 +52,7 @@ public class HttpParser {
         result.append("\n").append(response.body);
         return result.toString();
     }
-    public Response parseResponse(String response) {
+    static public Response parseResponse(String response) {
         Scanner scanner = new Scanner(response);
         if (scanner.hasNextLine()) {
             String startLine = scanner.nextLine();

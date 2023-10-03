@@ -7,6 +7,7 @@ import rest.Response;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -25,29 +26,36 @@ public class ContentServer extends AbstractClient implements Runnable {
 
     @Override
     public void run() {
-        putData();
+        try {
+            connect();
+            try {
+                Request req = createRequest();
+                sendRequest(req);
+                showResponse();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {}
+    }
+
+    public Request createRequest() throws UnknownHostException {
+        String body = input.toString();
+        Request req = new Request("PUT");
+        req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+        req.addHeader("Client-Id", id);
+        req.addHeader("User-Agent", getClass().getSimpleName());
+        req.addHeader("Server-Timing", Integer.toString(clock.get()));
+        req.addHeader("Content-Length", Integer.toString(body.length()));
+        req.setBody(body);
+        return req;
     }
 
     /**
      * Sends a PUT request to the server with the new data to be added.
      */
-    public void putData() {
-        try {
-            String body = input.toString();
-            Request req = new Request("PUT");
-            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
-            req.addHeader("User-Agent", getClass().getSimpleName());
-            req.addHeader("Server-Timing", Integer.toString(clock.get()));
-            req.addHeader("Content-Length", Integer.toString(body.length()));
-            req.setBody(body);
-
-            sendRequest(req);
-            Response res = getResponse();
-            System.out.println("PUT " + res.status);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public void showResponse() throws IOException, ClassNotFoundException {
+        Response res = getResponse();
+        System.out.println("PUT " + res.status);
     }
 
     /**

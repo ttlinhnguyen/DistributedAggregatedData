@@ -1,15 +1,17 @@
 package server;
 
 import clock.LamportClock;
+import server.helpers.*;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class AggregationServer implements Runnable {
+    private int port;
     private boolean running = true;
-    LamportClock clock;
-    final ServerSocket server;
+    private LamportClock clock;
+    private ServerSocket server;
     private PriorityBlockingQueue<RequestNode> requestQueue;
     private Storage storage;
 
@@ -22,11 +24,10 @@ public class AggregationServer implements Runnable {
      * @param port the port number
      */
     public AggregationServer(int port) throws IOException {
+        this.port = port;
         clock = new LamportClock();
         requestQueue = new PriorityBlockingQueue<>(11, new RequestComparator());
-        server = new ServerSocket(port);
         storage = new Storage(this, "src/main/java/server/weather.json");
-
     }
 
     /**
@@ -45,17 +46,23 @@ public class AggregationServer implements Runnable {
         }
     }
 
-//    @Override
     public void run() {
-        System.out.println("starting server");
-        startListener();
-        while (running) {
-            if (!requestQueue.isEmpty()) startHandlingRequest(requestQueue.poll());
+        try {
+            server = new ServerSocket(port);
+            startListener();
+            while (running) {
+                if (!requestQueue.isEmpty()) startHandlingRequest(requestQueue.poll());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     public void stop() {
-        listener.stop();
-        running = false;
+        try {
+            server.close();
+            listener.stop();
+            running = false;
+        } catch (Exception e) {}
     }
 
     private void startListener() {
@@ -73,4 +80,6 @@ public class AggregationServer implements Runnable {
     public ServerSocket getServerSocket() { return server; }
     public Storage getStorage() { return storage; }
     public boolean isRunning() { return running; }
+    public LamportClock getClock() { return clock; }
+    public void stopListener() { listener.stop(); }
 }
