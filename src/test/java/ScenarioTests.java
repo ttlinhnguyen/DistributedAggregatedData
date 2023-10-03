@@ -2,16 +2,14 @@ import client.getclient.GETClient;
 import client.content.ContentServer;
 import server.AggregationServer;
 
-import java.io.IOException;
 
 import static java.lang.Thread.sleep;
 
 public class ScenarioTests {
     private void clientReconnect() {
         try {
-            testDivider();
-            String testname = "TEST: Client tries to reconnect to server\n";
-            System.out.println(testname);
+            printTestTitle("Client tries to reconnect to server");
+            printTestExpected("Client reconnects after every 1 second for 3 times. Will be connected after the 2nd time.");
 
             AggregationServer server = new AggregationServer(4567);
             GETClient client1 = new GETClient("localhost", 4567);
@@ -32,9 +30,9 @@ public class ScenarioTests {
 
     private void clientReconnectFail() {
         try {
-            testDivider();
-            String testname = "TEST: Client tries to reconnect to server but fails\n";
-            System.out.println(testname);
+            printTestTitle("Client tries to reconnect to server but fails");
+            printTestExpected("Client reconnects after every 1 second for 3 times. After the 3rd time, client will stop.");
+
 
             GETClient client1 = new GETClient("localhost", 4567);
 
@@ -46,11 +44,37 @@ public class ScenarioTests {
         }
     }
 
+
+    private void sendNoContent() {
+        try {
+            printTestTitle("Sends no content to the server");
+            printTestExpected("Status code 204");
+
+            AggregationServer server = new AggregationServer(4567);
+            ContentServer content = new ContentServer("localhost", 4567);
+
+            Thread tServer = new Thread(server);
+            Thread tContent = new Thread(content);
+
+            tServer.start();
+
+            sleep(100);
+            tContent.start();
+
+            sleep(500);
+            server.removeAllData();
+            server.stop();
+            content.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getPutGet() {
         try {
-            testDivider();
-            String testname = "TEST: GET - PUT - GET\n";
-            System.out.println(testname);
+            printTestTitle("Sequential GET - PUT - GET");
+            printTestExpected("Follows the order GET, PUT, then GET. All of them returns 200 code.");
+
 
             AggregationServer server = new AggregationServer(4567);
             GETClient client1 = new GETClient("localhost", 4567);
@@ -72,7 +96,8 @@ public class ScenarioTests {
             sleep(100);
             tClient2.start();
 
-            sleep(4000);
+            sleep(500);
+            server.removeAllData();
             server.stop();
             content.stop();
             client1.stop();
@@ -83,9 +108,9 @@ public class ScenarioTests {
     }
     private void concurrentGetPut() {
         try {
-            testDivider();
-            String testname = "TEST: Concurrent GET and PUT\n";
-            System.out.println(testname);
+            printTestTitle("Concurrent GET and PUT");
+            printTestExpected("Returns GET - PUT or PUT - GET randomly with 200 code.\n"
+            + "Lamport clock works correctly in ascending order.");
 
             AggregationServer server = new AggregationServer(4567);
             GETClient client1 = new GETClient("localhost", 4567);
@@ -102,7 +127,8 @@ public class ScenarioTests {
             tContent.start();
             tClient1.start();
 
-            sleep(4000);
+            sleep(500);
+            server.removeAllData();
             server.stop();
             content.stop();
             client1.stop();
@@ -110,15 +136,151 @@ public class ScenarioTests {
             e.printStackTrace();
         }
     }
+    private void concurrentPutPut() {
+        try {
+            printTestTitle("Concurrent PUTs then GET");
+            printTestExpected("Correct data change with 200 code. Correct Lamport clock with ascending order.");
 
-    private void testDivider() {
-        System.out.println("===============================");
+            AggregationServer server = new AggregationServer(4567);
+            GETClient client1 = new GETClient("localhost", 4567);
+            ContentServer content1 = new ContentServer("localhost", 4567);
+            ContentServer content2 = new ContentServer("localhost", 4567);
+            content1.readInput("src/main/java/client/content/data1.txt");
+            content2.readInput("src/main/java/client/content/data2.txt");
+
+            Thread tServer = new Thread(server);
+            Thread tContent1 = new Thread(content1);
+            Thread tContent2 = new Thread(content2);
+            Thread tClient1 = new Thread(client1);
+
+            tServer.start();
+
+            sleep(100);
+            tContent1.start();
+            tContent2.start();
+            sleep(100);
+            tClient1.start();
+
+            sleep(500);
+            server.removeAllData();
+            server.stop();
+            content1.stop();
+            content2.stop();
+            client1.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    private void removeContentAfter30s() {
+        try {
+            printTestTitle("Server removes content after 30 seconds");
+            printTestExpected("Puts content to server. 1st client (within 30s) can retrieve that content. 2nd client (after 30s) retrieves nothing");
+
+            AggregationServer server = new AggregationServer(4567);
+            ContentServer content1 = new ContentServer("localhost", 4567);
+            content1.readInput("src/main/java/client/content/data1.txt");
+            GETClient client1 = new GETClient("localhost", 4567);
+            GETClient client2 = new GETClient("localhost", 4567);
+
+            Thread tServer = new Thread(server);
+            Thread tContent1 = new Thread(content1);
+            Thread tClient1 = new Thread(client1);
+            Thread tClient2 = new Thread(client2);
+
+            tServer.start();
+
+            sleep(100);
+            tContent1.start();
+            sleep(1000);
+            tClient1.start();
+
+            sleep(30*1000);
+            tClient2.start();
+            sleep(100);
+            server.stop();
+            content1.stop();
+            client1.stop();
+            client2.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void serverCrashes() {
+        try {
+            printTestTitle("Server crashes when clients are waiting for response.");
+            printTestExpected("Status code 500");
+
+            AggregationServer server = new AggregationServer(4567);
+            GETClient client1 = new GETClient("localhost", 4567);
+
+            Thread tServer = new Thread(server);
+            Thread tClient1 = new Thread(client1);
+
+            tServer.start();
+
+            sleep(100);
+            tClient1.start();
+            sleep(10);
+            server.stop();
+
+            sleep(100);
+            client1.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void clientCrashes() {
+        try {
+            printTestTitle("Client crashes when server is processing request");
+            printTestExpected("None");
+
+            AggregationServer server = new AggregationServer(4567);
+            GETClient client1 = new GETClient("localhost", 4567);
+
+            Thread tServer = new Thread(server);
+            Thread tClient1 = new Thread(client1);
+
+            tServer.start();
+
+            sleep(100);
+            tClient1.start();
+            sleep(10);
+            client1.stop();
+
+            sleep(100);
+            server.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void testDivider(String pattern) {
+        String res = "";
+        for (int i=0; i<20; i++) res+=pattern;
+        System.out.println(res);
+    }
+    private void printTestTitle(String s) {
+        System.out.println();
+        testDivider("=");
+        System.out.println("TEST: "+s);
+    }
+    private void printTestExpected(String s) {
+        System.out.println("Expected: "+s);
+        testDivider("-");
     }
     public static void main(String[] args) {
         ScenarioTests tests = new ScenarioTests();
-//        tests.clientReconnect();
+        tests.clientReconnect();
         tests.clientReconnectFail();
-//        tests.getPutGet();
-//        tests.concurrentGetPut();
+        tests.sendNoContent();
+        tests.serverCrashes();
+        tests.clientCrashes();
+        tests.getPutGet();
+        tests.concurrentGetPut();
+        tests.concurrentPutPut();
+        tests.removeContentAfter30s();
     }
 }

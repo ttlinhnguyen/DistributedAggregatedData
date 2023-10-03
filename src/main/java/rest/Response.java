@@ -15,7 +15,19 @@ public class Response extends Messages implements Serializable {
         super();
         this.status = status;
     }
-    public Response() {}
+    /**
+     * Creates a Response that contains the status, Lamport timestamp, and the body.<br>
+     * It implements the {@code Serializable} interface to be
+     * passed onto {@code ObjectOutputStream} and {@code ObjectInputStream}.
+     */
+    public Response() {
+        super();
+    }
+
+    /**
+     * Set the status code of the response.
+     * @param status Status code.
+     */
     public void setStatus(int status) {
         this.status = status;
     }

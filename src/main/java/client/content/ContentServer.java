@@ -7,7 +7,6 @@ import rest.Response;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -19,29 +18,26 @@ public class ContentServer extends AbstractClient implements Runnable {
      * @param hostname the hostname of the server
      * @param port the port number of the server
      */
-    public ContentServer(String hostname, int port) throws IOException, InterruptedException {
+    public ContentServer(String hostname, int port) {
         super(hostname, port);
         id = "Content-" + UUID.randomUUID();
+        input = new JSONObject();
     }
 
     @Override
     public void run() {
         try {
             connect();
-            try {
-                Request req = createRequest();
-                sendRequest(req);
-                showResponse();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            requestAndResponse();
         } catch (Exception e) {}
     }
 
-    public Request createRequest() throws UnknownHostException {
-        String body = input.toString();
+    public Request createRequest() {
+        String body = !input.isEmpty() ? input.toString() : "";
         Request req = new Request("PUT");
-        req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+        try {
+            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+        } catch (Exception e) {}
         req.addHeader("Client-Id", id);
         req.addHeader("User-Agent", getClass().getSimpleName());
         req.addHeader("Server-Timing", Integer.toString(clock.get()));

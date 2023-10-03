@@ -5,24 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="49cb824f-e53e-441a-9162-727e60c44314" name="Changes" comment="Add Lambda clock">
-      <change afterPath="$PROJECT_DIR$/src/main/java/server/helpers/RequestComparator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/UnitTests.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/AbstractClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/AbstractClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/content/ContentServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/content/ContentServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/client/content/data1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/content/data1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/client/getclient/GETClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/client/getclient/GETClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/rest/HttpParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/rest/HttpParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/rest/Messages.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/rest/Messages.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/rest/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/rest/Response.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/AggregationServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/AggregationServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/ClientHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/Listener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/RequestHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/RequestHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/RequestNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/RequestNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/server/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/Storage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/helpers/ClientHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/ClientHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/helpers/Listener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/Listener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/helpers/RequestHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/RequestHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/server/helpers/Storage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/helpers/Storage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/server/weather.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/server/weather.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/Tests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/ScenarioTests.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/ScenarioTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/ScenarioTests.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,7 +101,7 @@
       <option name="presentableId" value="Default" />
       <updated>1693986617400</updated>
       <workItem from="1693986618436" duration="37611000" />
-      <workItem from="1694483464862" duration="73426000" />
+      <workItem from="1694483464862" duration="85204000" />
     </task>
     <task id="LOCAL-00001" summary="Add server and get client">
       <option name="closed" value="true" />

@@ -22,10 +22,14 @@ public class RequestHandler {
         this.reqNode = reqNode;
         httpParser = new HttpParser();
     }
+
+    /**
+     * Handles the request and sends it back to the client through the output stream.
+     */
     public void run() {
         try {
             ObjectOutputStream outStream = new ObjectOutputStream(reqNode.socket.getOutputStream());
-            Response res = getResponse(reqNode);
+            Response res = getResponse(reqNode.request);
             String resHttpString = httpParser.createResponse(res);
             outStream.writeObject(resHttpString); // send response
             System.out.println("server clock " + server.getClock().get());
@@ -34,8 +38,12 @@ public class RequestHandler {
         }
     }
 
-    private Response getResponse(RequestNode reqNode) {
-        Request req = reqNode.request;
+    /**
+     * Interacts with the storage based on the request method and returns a response
+     * @param req A request of the client
+     * @return A corresponding response
+     */
+    private Response getResponse(Request req) {
         Response res = new Response();
         if (req.method.equals("GET")) {
             String data = storage.getWeatherData();

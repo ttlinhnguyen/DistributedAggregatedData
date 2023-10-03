@@ -20,6 +20,10 @@ public class Storage {
         updateLocalData();
     }
 
+    /**
+     * Retrieves the weather data stored in the server
+     * @return A JSON string of the weather data
+     */
     public String getWeatherData() {
         clock.increment();
         return data.toString();
@@ -38,6 +42,10 @@ public class Storage {
         updateDbFile();
     }
 
+    /**
+     * Remove the weather data submitted by the content server with the specified id.
+     * @param id The id of the content server.
+     */
     public void removeWeatherData(String id) {
         if (id!=null && data.has(id)) {
             data.remove(id);
@@ -46,6 +54,17 @@ public class Storage {
         }
     }
 
+    /**
+     * Remove all weather data.
+     */
+    public void removeAllData() {
+        data = new JSONObject();
+        updateDbFile();
+    }
+
+    /**
+     * Updates the data file using the local data.
+     */
     private void updateDbFile() {
         try {
             FileWriter writer = new FileWriter(dbPath);
@@ -57,6 +76,9 @@ public class Storage {
         }
     }
 
+    /**
+     * Updates the local data from the data file.
+     */
     private void updateLocalData() {
         try {
             File db = new File(dbPath);

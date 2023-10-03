@@ -22,7 +22,6 @@ public class ClientHandler implements Runnable{
      * Constantly listens to the input stream from the client socket
      * until the socket is timeout. Remove the content after the timeout.
      */
-
     public ClientHandler(Socket socket, AggregationServer server) {
         this.socket = socket;
         this.requestQueue = server.getRequestQueue();
@@ -31,11 +30,14 @@ public class ClientHandler implements Runnable{
         cliendId = "";
     }
 
+    /**
+     * While the socket is not timeout, add the request to the server's request queue.
+     */
     @Override
     public void run() {
         ObjectInputStream inputStream;
         try {
-            socket.setSoTimeout(3 * 1000);
+            socket.setSoTimeout(30 * 1000);
             while (server.isRunning()) {
                 inputStream = new ObjectInputStream(socket.getInputStream());
                 reqHttpString = (String) inputStream.readObject();
@@ -52,5 +54,4 @@ public class ClientHandler implements Runnable{
         }
 
     }
-    public String getReqHttpString() { return reqHttpString; }
 }

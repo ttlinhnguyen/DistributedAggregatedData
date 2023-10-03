@@ -17,7 +17,7 @@ public class GETClient extends AbstractClient implements Runnable {
      * @param hostname the hostname of the server
      * @param port the port number of the server
      */
-    public GETClient(String hostname, int port) throws IOException, InterruptedException {
+    public GETClient(String hostname, int port) {
         super(hostname, port);
     }
 
@@ -25,19 +25,15 @@ public class GETClient extends AbstractClient implements Runnable {
     public void run() {
         try {
             connect();
-            try {
-                Request req = createRequest();
-                sendRequest(req);
-                showResponse();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            requestAndResponse();
         } catch (Exception e) {}
     }
 
-    public Request createRequest() throws IOException {
+    public Request createRequest() {
         Request req = new Request("GET");
-        req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+        try {
+            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
+        } catch (Exception e) {}
         req.addHeader("User-Agent", getClass().getSimpleName());
         req.addHeader("Accept", "application/json");
         req.addHeader("Server-Timing", Integer.toString(clock.get()));
@@ -49,10 +45,15 @@ public class GETClient extends AbstractClient implements Runnable {
      * Sends a GET request to the server to get the weather data and print out the response.
      */
     public void showResponse() throws IOException, ClassNotFoundException {
-            Response res = getResponse();
-            System.out.println("GET " + res.status);
-            displayData(new JSONObject(res.body));
+        Response res = getResponse();
+        System.out.println("GET " + res.status);
+        if (res.body!=null) displayData(new JSONObject(res.body));
     }
+
+    /**
+     * Prints out the formatted weather data retrieved from the server
+     * @param obj The weather data in JSON.
+     */
     private void displayData(JSONObject obj) {
         Iterator<String> it = obj.keys();
         while (it.hasNext()) {

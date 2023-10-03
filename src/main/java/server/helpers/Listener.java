@@ -16,7 +16,6 @@ public class Listener implements Runnable {
      * Listens to the incoming clients and creates a `ClientHandler` thread
      * corresponding to that client.
      */
-
     public Listener (AggregationServer server) {
         running = true;
         this.server = server;

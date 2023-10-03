@@ -3,6 +3,10 @@ package rest;
 import java.util.Scanner;
 
 public class HttpParser {
+    /**
+     * Create a formatted HTTP request string from the provided {@code Request} object.
+     * @return a valid HTTP request string
+     */
     static public String createRequest(Request request) {
         StringBuilder result = new StringBuilder();
         result.append(request.method).append(" /weather.json HTTP/1.1\n");
@@ -13,6 +17,12 @@ public class HttpParser {
         result.append("\n").append(request.body);
         return result.toString();
     }
+
+    /**
+     * Parse the HTTP request to a {@code Request} object.
+     * @param request a valid HTTP request string.
+     * @return a {@code Request} object
+     */
     static public Request parseRequest(String request) {
         Scanner scanner = new Scanner(request);
         if (scanner.hasNextLine()) {
@@ -42,6 +52,11 @@ public class HttpParser {
         }
         return null;
     }
+
+    /**
+     * Create a formatted HTTP response string from the provided {@code Response} object.
+     * @return a valid HTTP response string
+     */
     public String createResponse(Response response) {
         StringBuilder result = new StringBuilder();
         result.append("HTTP/1.1 ").append(response.status).append("\n");
@@ -52,6 +67,12 @@ public class HttpParser {
         result.append("\n").append(response.body);
         return result.toString();
     }
+
+    /**
+     * Parse the HTTP response to a {@code Response} object.
+     * @param response a valid HTTP response string.
+     * @return a {@code Response} object
+     */
     static public Response parseResponse(String response) {
         Scanner scanner = new Scanner(response);
         if (scanner.hasNextLine()) {

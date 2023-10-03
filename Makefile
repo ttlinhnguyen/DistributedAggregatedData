@@ -1,7 +1,7 @@
 CLASSPATH := \
 .:./lib/json-20230618.jar:./target/classes:./target/test-classes
 
-TEST := src/test/java/Tests.java
+TEST := src/test/java/ScenarioTests.java
 
 CLASSES := client/*.java \
 	clock/*.java \
@@ -16,7 +16,7 @@ CLASSES := $(foreach c, $(CLASSES), src/main/java/$(c))
 run: compile tests
 
 tests:
-	java -cp $(CLASSPATH) Tests
+	java -cp $(CLASSPATH) ScenarioTests
 
 server:
 	java -cp $(CLASSPATH) server.AggregationServer

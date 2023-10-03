@@ -31,6 +31,57 @@ public class AggregationServer implements Runnable {
     }
 
     /**
+     * Bounds the socket to the specified port. Runs a {@code Listener} and handles oncoming requests.
+     */
+    public void run() {
+        try {
+            server = new ServerSocket(port);
+            startListener();
+            while (running) {
+                if (!requestQueue.isEmpty()) startHandlingRequest(requestQueue.poll());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Closes the server socket and other helper threads.
+     */
+    public void stop() {
+        try {
+            server.close();
+            listener.stop();
+            running = false;
+        } catch (Exception e) {}
+    }
+
+    /**
+     * Starts a {@Listener} to listens to client sockets.
+     */
+    private void startListener() {
+        listener = new Listener(this);
+        Thread t = new Thread(listener);
+        t.start();
+    }
+
+    /**
+     * Handles the request in the queue.
+     */
+    private void startHandlingRequest(RequestNode reqNode) {
+        RequestHandler handler = new RequestHandler(reqNode, this);
+        handler.run();
+    }
+
+    public PriorityBlockingQueue<RequestNode> getRequestQueue() { return requestQueue; }
+    public ServerSocket getServerSocket() { return server; }
+    public Storage getStorage() { return storage; }
+    public boolean isRunning() { return running; }
+    public LamportClock getClock() { return clock; }
+    public void stopListener() { listener.stop(); }
+    public void removeAllData() { storage.removeAllData(); }
+
+    /**
      * The command line arguments take one port number. If not provided, then the port
      * will be set to 4567.
      * @param args port number
@@ -45,41 +96,4 @@ public class AggregationServer implements Runnable {
             e.printStackTrace();
         }
     }
-
-    public void run() {
-        try {
-            server = new ServerSocket(port);
-            startListener();
-            while (running) {
-                if (!requestQueue.isEmpty()) startHandlingRequest(requestQueue.poll());
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public void stop() {
-        try {
-            server.close();
-            listener.stop();
-            running = false;
-        } catch (Exception e) {}
-    }
-
-    private void startListener() {
-        listener = new Listener(this);
-        Thread t = new Thread(listener);
-        t.start();
-    }
-
-    private void startHandlingRequest(RequestNode reqNode) {
-        RequestHandler handler = new RequestHandler(reqNode, this);
-        handler.run();
-    }
-
-    public PriorityBlockingQueue<RequestNode> getRequestQueue() { return requestQueue; }
-    public ServerSocket getServerSocket() { return server; }
-    public Storage getStorage() { return storage; }
-    public boolean isRunning() { return running; }
-    public LamportClock getClock() { return clock; }
-    public void stopListener() { listener.stop(); }
 }
