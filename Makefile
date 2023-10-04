@@ -8,6 +8,7 @@ CLASSES := client/*.java \
 	client/content/*.java \
 	client/getclient/*.java \
 	server/*.java \
+	server/helpers/*.java \
 	rest/*.java \
 	rest/*.java
 
