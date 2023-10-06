@@ -3,9 +3,13 @@ import client.content.ContentServer;
 import server.AggregationServer;
 
 
+import java.lang.reflect.Method;
+
 import static java.lang.Thread.sleep;
 
 public class ScenarioTests {
+
+    @Test
     private void clientReconnect() {
         try {
             printTestTitle("Client tries to reconnect to server");
@@ -28,6 +32,7 @@ public class ScenarioTests {
         }
     }
 
+    @Test
     private void clientReconnectFail() {
         try {
             printTestTitle("Client tries to reconnect to server but fails");
@@ -44,7 +49,7 @@ public class ScenarioTests {
         }
     }
 
-
+    @Test
     private void sendNoContent() {
         try {
             printTestTitle("Sends no content to the server");
@@ -70,6 +75,7 @@ public class ScenarioTests {
         }
     }
 
+    @Test
     private void getPutGet() {
         try {
             printTestTitle("Sequential GET - PUT - GET");
@@ -106,6 +112,8 @@ public class ScenarioTests {
             e.printStackTrace();
         }
     }
+
+    @Test
     private void concurrentGetPut() {
         try {
             printTestTitle("Concurrent GET and PUT");
@@ -136,6 +144,8 @@ public class ScenarioTests {
             e.printStackTrace();
         }
     }
+
+    @Test
     private void concurrentPutPut() {
         try {
             printTestTitle("Concurrent PUTs then GET");
@@ -171,6 +181,8 @@ public class ScenarioTests {
             e.printStackTrace();
         }
     }
+
+    @Test
     private void removeContentAfter30s() {
         try {
             printTestTitle("Server removes content after 30 seconds");
@@ -206,6 +218,7 @@ public class ScenarioTests {
         }
     }
 
+    @Test
     private void serverCrashes() {
         try {
             printTestTitle("Server crashes when clients are waiting for response.");
@@ -231,7 +244,7 @@ public class ScenarioTests {
         }
     }
 
-
+    @Test
     private void clientCrashes() {
         try {
             printTestTitle("Client crashes when server is processing request");
@@ -252,6 +265,44 @@ public class ScenarioTests {
 
             sleep(100);
             server.stop();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    private void lotsOfPuts() {
+        try {
+            printTestTitle("Lots of Puts. Delete the earliest content if it exceeds 20");
+            printTestExpected("The result only shows 20 latest content from a content server");
+
+            AggregationServer server = new AggregationServer(4567);
+            GETClient client1 = new GETClient("localhost", 4567);
+            ContentServer content1 = new ContentServer("localhost", 4567);
+            content1.readInput("src/main/java/client/content/data1.txt");
+
+            Thread tServer = new Thread(server);
+            Thread tContent1 = new Thread(content1);
+            Thread tClient = new Thread(client1);
+
+            tServer.start();
+
+            sleep(100);
+            tContent1.start();
+
+            for (int i=0; i<21; i++) {
+                sleep(100);
+                content1.readInput("src/main/java/client/content/data1.txt");
+                content1.requestAndResponse();
+            }
+
+            tClient.start();
+
+            sleep(100);
+            server.removeAllData();
+            server.stop();
+            content1.stop();
+            client1.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -281,6 +332,7 @@ public class ScenarioTests {
         tests.getPutGet();
         tests.concurrentGetPut();
         tests.concurrentPutPut();
+        tests.lotsOfPuts();
         tests.removeContentAfter30s();
     }
 }

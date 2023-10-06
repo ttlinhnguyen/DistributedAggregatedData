@@ -13,7 +13,9 @@ import java.util.Iterator;
 public class GETClient extends AbstractClient implements Runnable {
 
     /**
-     * Creates a GET client connected to a host with a specified port.
+     * Constructor for a GET client.
+     * To connect to the server, run {@code connect()}. To send request to the server,
+     * call {@code requestAndResponse()} to send the request and receive the response from the server.
      * @param hostname the hostname of the server
      * @param port the port number of the server
      */
@@ -30,21 +32,13 @@ public class GETClient extends AbstractClient implements Runnable {
     }
 
     public Request createRequest() {
-        Request req = new Request("GET");
-        try {
-            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
-        } catch (Exception e) {}
-        req.addHeader("User-Agent", getClass().getSimpleName());
-        req.addHeader("Accept", "application/json");
-        req.addHeader("Server-Timing", Integer.toString(clock.get()));
-        req.setBody("");
-        return req;
+        return createRequestHelper("GET", "");
     }
 
     /**
      * Sends a GET request to the server to get the weather data and print out the response.
      */
-    public void showResponse() throws IOException, ClassNotFoundException {
+    protected void showResponse() throws IOException, ClassNotFoundException {
         Response res = getResponse();
         System.out.println("GET " + res.status);
         if (res.body!=null) displayData(new JSONObject(res.body));
@@ -63,8 +57,8 @@ public class GETClient extends AbstractClient implements Runnable {
                 for (String key : item.keySet()) {
                     System.out.format("%20s │ %s%n", key, item.get(key));
                 }
+                System.out.println();
             }
-            System.out.println();
         }
     }
 
@@ -78,6 +72,7 @@ public class GETClient extends AbstractClient implements Runnable {
             String[] path = args[0].split(":", 2);
             String hostname = path[0];
             int port = Integer.parseInt(path[1]);
+
             Thread client = new Thread(new GETClient(hostname, port));
             client.start();
         } catch (ArrayIndexOutOfBoundsException e) {

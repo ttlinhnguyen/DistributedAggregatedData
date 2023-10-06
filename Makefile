@@ -1,7 +1,7 @@
 CLASSPATH := \
-.:./lib/json-20230618.jar:./target/classes:./target/test-classes
+.:./lib/json-20230618.jar:./lib/hamcrest-core-1.3-javadoc.jar:./lib/junit-4.13.2-javadoc.jar:./target/classes:./target/test-classes
 
-TEST := src/test/java/ScenarioTests.java
+TEST := src/test/java/*.java
 
 CLASSES := client/*.java \
 	clock/*.java \
@@ -16,6 +16,8 @@ CLASSES := $(foreach c, $(CLASSES), src/main/java/$(c))
 
 run: compile tests
 
+unit:
+	java -cp $(CLASSPATH) UnitTests
 tests:
 	java -cp $(CLASSPATH) ScenarioTests
 

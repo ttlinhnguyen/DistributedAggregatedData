@@ -5,6 +5,7 @@ import server.helpers.*;
 
 import java.io.*;
 import java.net.ServerSocket;
+import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class AggregationServer implements Runnable {
@@ -26,7 +27,7 @@ public class AggregationServer implements Runnable {
     public AggregationServer(int port) throws IOException {
         this.port = port;
         clock = new LamportClock();
-        requestQueue = new PriorityBlockingQueue<>(11, new RequestComparator());
+        requestQueue = new PriorityBlockingQueue<>(11, Comparator.comparingLong(RequestNode::getPriority));
         storage = new Storage(this, "src/main/java/server/weather.json");
     }
 

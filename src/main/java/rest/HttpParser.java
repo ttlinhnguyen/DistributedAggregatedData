@@ -57,7 +57,7 @@ public class HttpParser {
      * Create a formatted HTTP response string from the provided {@code Response} object.
      * @return a valid HTTP response string
      */
-    public String createResponse(Response response) {
+    public static String createResponse(Response response) {
         StringBuilder result = new StringBuilder();
         result.append("HTTP/1.1 ").append(response.status).append("\n");
 

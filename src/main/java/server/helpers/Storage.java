@@ -7,16 +7,19 @@ import server.AggregationServer;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Scanner;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class Storage {
+    int CAP = 20;
     String dbPath;
     private JSONObject data;
     private LamportClock clock;
+    private File db;
     public Storage(AggregationServer server, String filename) {
         this.clock = server.getClock();
         this.dbPath = filename;
-
+        db = new File(dbPath);
         updateLocalData();
     }
 
@@ -39,6 +42,28 @@ public class Storage {
         String clientId = obj.getString("id");
         if (!data.has(clientId)) data.put(clientId, new JSONArray());
         data.getJSONArray(clientId).put(obj);
+
+        if (data.getJSONArray(clientId).length() > CAP) {
+            JSONArray jsonArr = data.getJSONArray(clientId);
+            ArrayList<JSONObject> arr = new ArrayList<>();
+            for (int i=0; i<jsonArr.length(); i++) {
+                arr.add(jsonArr.getJSONObject(i));
+            }
+            arr.sort((o1, o2) -> {
+                Timestamp t1 = Timestamp.valueOf((String) o1.get("timestamp"));
+                Timestamp t2 = Timestamp.valueOf((String) o2.get("timestamp"));
+                return t1.compareTo(t2);
+            });
+
+            int i = arr.size()-1;
+            while (i>=CAP) {
+                arr.remove(i);
+                i--;
+            }
+
+            data.getJSONArray(clientId).clear();
+            data.getJSONArray(clientId).putAll(arr);
+        }
         updateDbFile();
     }
 
@@ -67,7 +92,7 @@ public class Storage {
      */
     private void updateDbFile() {
         try {
-            FileWriter writer = new FileWriter(dbPath);
+            FileWriter writer = new FileWriter(db);
             writer.write(data.toString());
             writer.flush();
             writer.close();
@@ -81,7 +106,6 @@ public class Storage {
      */
     private void updateLocalData() {
         try {
-            File db = new File(dbPath);
             db.createNewFile();
             Scanner scanner = new Scanner(db);
             String dbText = "";
@@ -95,5 +119,7 @@ public class Storage {
             e.printStackTrace();
         }
     }
+
+    public boolean isEmpty() { return data.isEmpty(); }
 
 }

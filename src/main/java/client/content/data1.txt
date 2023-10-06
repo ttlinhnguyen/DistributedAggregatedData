@@ -1,6 +1,5 @@
 name: Adelaide (West Terrace /  ngayirdapira)
 state: SA
-local_date_time: 15/04:00pm
 air_temp: 13.3
 cloud: Partly cloudy
 rel_hum: 60

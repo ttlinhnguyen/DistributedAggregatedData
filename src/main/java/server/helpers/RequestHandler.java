@@ -11,7 +11,6 @@ import server.AggregationServer;
 import java.io.ObjectOutputStream;
 
 public class RequestHandler {
-    private HttpParser httpParser;
     private AggregationServer server;
     private RequestNode reqNode;
     private Storage storage;
@@ -20,7 +19,6 @@ public class RequestHandler {
         this.server = server;
         this.storage = server.getStorage();
         this.reqNode = reqNode;
-        httpParser = new HttpParser();
     }
 
     /**
@@ -30,7 +28,7 @@ public class RequestHandler {
         try {
             ObjectOutputStream outStream = new ObjectOutputStream(reqNode.socket.getOutputStream());
             Response res = getResponse(reqNode.request);
-            String resHttpString = httpParser.createResponse(res);
+            String resHttpString = HttpParser.createResponse(res);
             outStream.writeObject(resHttpString); // send response
             System.out.println("server clock " + server.getClock().get());
         } catch (Exception e) {
@@ -53,10 +51,11 @@ public class RequestHandler {
             if (req.body.isEmpty()) res.setStatus(204);
             else {
                 try {
+                    if (storage.isEmpty()) res.setStatus(201);
+                    else res.setStatus(200);
                     JSONObject newObj = new JSONObject(req.body);
                     if (!req.headers.containsKey("Server-Timing")) storage.putWeatherData(newObj, 0);
                     else storage.putWeatherData(newObj, Integer.parseInt(req.headers.get("Server-Timing")));
-                    res.setStatus(200);
                 } catch (JSONException e) {
                     res.setStatus(500);
                 }

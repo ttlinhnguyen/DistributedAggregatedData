@@ -7,21 +7,26 @@ import rest.Response;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.sql.Timestamp;
 import java.util.Scanner;
 import java.util.UUID;
 
 public class ContentServer extends AbstractClient implements Runnable {
     String id;
-    JSONObject input;
+    String body;
+
     /**
-     * Creates a content server connected to a host with a specified port.
+     * Constructor for the content server.
+     * To connect to the server, run {@code connect()}. To send request to the server,
+     * call {@code readInput(filename)} to load up the data first, then call
+     * {@code requestAndResponse()} to send the request and receive the response from the server.
      * @param hostname the hostname of the server
      * @param port the port number of the server
      */
     public ContentServer(String hostname, int port) {
         super(hostname, port);
         id = "Content-" + UUID.randomUUID();
-        input = new JSONObject();
+        body = "";
     }
 
     @Override
@@ -33,23 +38,13 @@ public class ContentServer extends AbstractClient implements Runnable {
     }
 
     public Request createRequest() {
-        String body = !input.isEmpty() ? input.toString() : "";
-        Request req = new Request("PUT");
-        try {
-            req.addHeader("Host", InetAddress.getLocalHost().getHostName());
-        } catch (Exception e) {}
-        req.addHeader("Client-Id", id);
-        req.addHeader("User-Agent", getClass().getSimpleName());
-        req.addHeader("Server-Timing", Integer.toString(clock.get()));
-        req.addHeader("Content-Length", Integer.toString(body.length()));
-        req.setBody(body);
-        return req;
+        return createRequestHelper("PUT", body);
     }
 
     /**
      * Sends a PUT request to the server with the new data to be added.
      */
-    public void showResponse() throws IOException, ClassNotFoundException {
+    protected void showResponse() throws IOException, ClassNotFoundException {
         Response res = getResponse();
         System.out.println("PUT " + res.status);
     }
@@ -58,9 +53,14 @@ public class ContentServer extends AbstractClient implements Runnable {
      * Transforms the input file to a JSONObject.
      * @param filename the path to the input file
      */
-    public void readInput(String filename) throws FileNotFoundException, NullPointerException {
+    public void readInput(String filename) throws FileNotFoundException {
+        if (filename==null || filename.isEmpty()) {
+            body = "";
+            return;
+        }
+
         File f = new File(filename);
-        input = new JSONObject();
+        JSONObject input = new JSONObject();
         Scanner scanner = new Scanner(f);
         while (scanner.hasNextLine()) {
             String s = scanner.nextLine();
@@ -69,6 +69,8 @@ public class ContentServer extends AbstractClient implements Runnable {
         }
         scanner.close();
         input.put("id", id);
+        input.put("timestamp", new Timestamp(System.currentTimeMillis()));
+        body = !input.isEmpty() ? input.toString() : "";
     }
 
     /**
@@ -82,11 +84,11 @@ public class ContentServer extends AbstractClient implements Runnable {
             String hostname = path[0];
             int port = Integer.parseInt(path[1]);
 
-            String inputFilePath = args[1]; // example: src/main/java/content/data1.txt
+            String inputFilePath = args.length>1 ? args[1] : "" ; // example: src/main/java/content/data1.txt
 
-            Thread client = new Thread(new ContentServer(hostname, port));
-            client.start();
-
+            ContentServer contentServer = new ContentServer(hostname, port);
+            contentServer.readInput(inputFilePath);
+            contentServer.run();
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println("ERROR: Bad arguments.");
         } catch (Exception e) {

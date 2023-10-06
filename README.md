@@ -1,16 +1,27 @@
 # Assignment 2 - Distributed Systems
-## Aggregation Server
-The aggregation server upon running creates a `Listener` thread which listens to any stream/request
-coming in and the `ClientHandler` adds the request to the queue. While the server is active, `RequestHandler`
-pops the request from the queue and calls the appropriate method from `Storage` to get/put the weather data.
+## Main Compositions
+### Aggregation Server
+An aggregation server responsible for responding to requests and making
+changes to the weather database stored in JSON.
 
-## Functionality
+### Content Server
+Content server provides weather data in JSON format to the aggregation server.
+
+### GET Client
+GET client retrieves JSON weather data from the aggregation server.
+
+## Main Functionality
 * Seamless communication between the server and clients.
 * HTTP compliant messages between the server and clients with appropriate status code.
 * Support for multiple simultaneous PUT and GET requests.
 * Removal of expired content after 30 seconds.
 * Retry to connect when the server is not available upon initial connection and request sending.
 * Lamport Clock follows correct ascending logical time order.
+
+## Aggregation Server
+The aggregation server upon running creates a `Listener` thread which listens to any stream/request
+coming in and the `ClientHandler` adds the request to the queue. While the server is active, `RequestHandler`
+pops the request from the queue and calls the appropriate method from `Storage` to get/put the weather data.
 
 ## Automated Testing
 ### Testing harness / Scenario Tests
