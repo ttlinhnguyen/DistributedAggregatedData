@@ -40,8 +40,8 @@ public class AggregationServer implements Runnable {
      */
     public void run() {
         try {
-            storage = new Storage(this, "src/main/java/server/weather.json");
             server = new ServerSocket(port);
+            storage = new Storage(this, "src/main/java/server/weather.json");
             startListener();
             while (running) {
                 if (!requestQueue.isEmpty()) startHandlingRequest(requestQueue.poll());

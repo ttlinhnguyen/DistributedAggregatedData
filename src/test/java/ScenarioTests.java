@@ -227,20 +227,22 @@ public class ScenarioTests {
             printTestExpected("Status code 500");
 
             AggregationServer server = new AggregationServer(4567);
-            GETClient client1 = new GETClient("localhost", 4567);
+            ContentServer content1 = new ContentServer("localhost", 4567);
+            content1.readInput(data1);
 
             Thread tServer = new Thread(server);
-            Thread tClient1 = new Thread(client1);
+            Thread tContent1 = new Thread(content1);
 
             tServer.start();
 
             sleep(100);
-            tClient1.start();
+            tContent1.start();
             sleep(10);
+            server.removeAllData();
             server.stop();
 
             sleep(100);
-            client1.stop();
+            content1.stop();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -253,19 +255,21 @@ public class ScenarioTests {
             printTestExpected("None");
 
             AggregationServer server = new AggregationServer(4567);
-            GETClient client1 = new GETClient("localhost", 4567);
+            ContentServer content1 = new ContentServer("localhost", 4567);
+            content1.readInput(data1);
 
             Thread tServer = new Thread(server);
-            Thread tClient1 = new Thread(client1);
+            Thread tContent1 = new Thread(content1);
 
             tServer.start();
 
             sleep(100);
-            tClient1.start();
-            sleep(10);
-            client1.stop();
+            tContent1.start();
+            sleep(3);
+            content1.stop();
 
             sleep(100);
+            server.removeAllData();
             server.stop();
         } catch (Exception e) {
             e.printStackTrace();
