@@ -12,6 +12,7 @@ import java.util.Scanner;
 import java.util.UUID;
 
 public class ContentServer extends AbstractClient implements Runnable {
+    String dir = "src/main/java/client/content";
     String id;
     String body;
 
@@ -59,7 +60,7 @@ public class ContentServer extends AbstractClient implements Runnable {
             return;
         }
 
-        File f = new File(filename);
+        File f = new File(dir+"/"+ filename);
         JSONObject input = new JSONObject();
         Scanner scanner = new Scanner(f);
         while (scanner.hasNextLine()) {
@@ -84,7 +85,7 @@ public class ContentServer extends AbstractClient implements Runnable {
             String hostname = path[0];
             int port = Integer.parseInt(path[1]);
 
-            String inputFilePath = args.length>1 ? args[1] : "" ; // example: src/main/java/content/data1.txt
+            String inputFilePath = args.length>1 ? args[1] : "" ; // example: data1.txt
 
             ContentServer contentServer = new ContentServer(hostname, port);
             contentServer.readInput(inputFilePath);

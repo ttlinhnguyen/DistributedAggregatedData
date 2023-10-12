@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 import static java.lang.Thread.sleep;
 
 public class ScenarioTests {
+    private String data1 = "data1.txt";
+    private String data2 = "data2.txt";
 
     @Test
     private void clientReconnect() {
@@ -86,7 +88,7 @@ public class ScenarioTests {
             GETClient client1 = new GETClient("localhost", 4567);
             GETClient client2 = new GETClient("localhost", 4567);
             ContentServer content = new ContentServer("localhost", 4567);
-            content.readInput("src/main/java/client/content/data1.txt");
+            content.readInput(data1);
 
             Thread tServer = new Thread(server);
             Thread tContent = new Thread(content);
@@ -123,7 +125,7 @@ public class ScenarioTests {
             AggregationServer server = new AggregationServer(4567);
             GETClient client1 = new GETClient("localhost", 4567);
             ContentServer content = new ContentServer("localhost", 4567);
-            content.readInput("src/main/java/client/content/data1.txt");
+            content.readInput(data1);
 
             Thread tServer = new Thread(server);
             Thread tContent = new Thread(content);
@@ -155,8 +157,8 @@ public class ScenarioTests {
             GETClient client1 = new GETClient("localhost", 4567);
             ContentServer content1 = new ContentServer("localhost", 4567);
             ContentServer content2 = new ContentServer("localhost", 4567);
-            content1.readInput("src/main/java/client/content/data1.txt");
-            content2.readInput("src/main/java/client/content/data2.txt");
+            content1.readInput(data1);
+            content2.readInput(data2);
 
             Thread tServer = new Thread(server);
             Thread tContent1 = new Thread(content1);
@@ -190,7 +192,7 @@ public class ScenarioTests {
 
             AggregationServer server = new AggregationServer(4567);
             ContentServer content1 = new ContentServer("localhost", 4567);
-            content1.readInput("src/main/java/client/content/data1.txt");
+            content1.readInput(data1);
             GETClient client1 = new GETClient("localhost", 4567);
             GETClient client2 = new GETClient("localhost", 4567);
 
@@ -279,7 +281,7 @@ public class ScenarioTests {
             AggregationServer server = new AggregationServer(4567);
             GETClient client1 = new GETClient("localhost", 4567);
             ContentServer content1 = new ContentServer("localhost", 4567);
-            content1.readInput("src/main/java/client/content/data1.txt");
+            content1.readInput(data1);
 
             Thread tServer = new Thread(server);
             Thread tContent1 = new Thread(content1);
@@ -292,7 +294,7 @@ public class ScenarioTests {
 
             for (int i=0; i<21; i++) {
                 sleep(100);
-                content1.readInput("src/main/java/client/content/data1.txt");
+                content1.readInput(data1);
                 content1.requestAndResponse();
             }
 

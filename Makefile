@@ -28,7 +28,7 @@ client:
 	java -cp $(CLASSPATH) client.getclient.GETClient localhost:4567
 
 content:
-	java -cp $(CLASSPATH) client.content.ContentServer localhost:4567 src/main/java/client/content/data1.txt
+	java -cp $(CLASSPATH) client.content.ContentServer localhost:4567 data1.txt
 
 compile: make_dir compile_class compile_test
 
