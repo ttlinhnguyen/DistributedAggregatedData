@@ -37,11 +37,13 @@ public class RequestHandler {
     }
 
     /**
-     * Interacts with the storage based on the request method and returns a response
+     * Interacts with the storage based on the request method and returns a response.
+     * For PUT request, initial request returns 201, a successful update returns 200, empty content from the client
+     * returns 204. If the request method is neither GET or PUT, return 400. Any other problems return 500.
      * @param req A request of the client
      * @return A corresponding response
      */
-    private Response getResponse(Request req) {
+    private Response getResponse(Request req) throws InterruptedException {
         Response res = new Response();
         if (req.method.equals("GET")) {
             String data = storage.getWeatherData();

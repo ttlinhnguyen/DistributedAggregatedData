@@ -47,7 +47,11 @@ public class ClientHandler implements Runnable{
                 cliendId = req.headers.get("Client-Id");
             }
         } catch (SocketTimeoutException e) {
-            server.getStorage().removeWeatherData(cliendId);
+            try {
+                server.getStorage().removeWeatherData(cliendId);
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
         } catch (EOFException e) {
         } catch (Exception e) {
             e.printStackTrace();

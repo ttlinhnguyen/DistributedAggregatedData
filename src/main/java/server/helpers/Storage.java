@@ -9,17 +9,25 @@ import java.io.File;
 import java.io.FileWriter;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class Storage {
     int CAP = 20;
-    String dbPath;
+    String path;
+    private AggregationServer server;
     private JSONObject data;
     private LamportClock clock;
+    private Semaphore lock;
+//    private Replica replica;
     private File db;
-    public Storage(AggregationServer server, String filename) {
+    public Storage(AggregationServer server, String path) {
+        this.server = server;
         this.clock = server.getClock();
-        this.dbPath = filename;
-        db = new File(dbPath);
+        this.lock = server.getFileLock();
+//        this.replica = server.getReplica();
+
+        this.path = path;
+        this.db = new File(this.path);
         updateLocalData();
     }
 
@@ -27,7 +35,7 @@ public class Storage {
      * Retrieves the weather data stored in the server
      * @return A JSON string of the weather data
      */
-    public String getWeatherData() {
+    public String getWeatherData() throws InterruptedException {
         clock.increment();
         return data.toString();
     }
@@ -37,13 +45,43 @@ public class Storage {
      * @param obj the new data to be added
      * @param clockTime the LamportClock timestamp from the client
      */
-    public void putWeatherData(JSONObject obj, int clockTime) {
+    public void putWeatherData(JSONObject obj, int clockTime) throws InterruptedException {
         clock.update(clockTime);
         String clientId = obj.getString("id");
+
+        // update local data
         if (!data.has(clientId)) data.put(clientId, new JSONArray());
         data.getJSONArray(clientId).put(obj);
+        keepLatestData(clientId, CAP);
 
-        if (data.getJSONArray(clientId).length() > CAP) {
+        updateDbFile();
+        replicate();
+    }
+
+    /**
+     * Remove the weather data submitted by the content server with the specified id.
+     * @param id The id of the content server.
+     */
+    public void removeWeatherData(String id) throws InterruptedException {
+        if (id!=null && data.has(id)) {
+            data.remove(id);
+            updateDbFile();
+            System.out.println("Delete content from " + id);
+        }
+        replicate();
+    }
+
+    /**
+     * Remove all weather data.
+     */
+    public void removeAllData() throws InterruptedException {
+        data = new JSONObject();
+        updateDbFile();
+        replicate();
+    }
+
+    private void keepLatestData(String clientId, int capacity) {
+        if (data.getJSONArray(clientId).length() > capacity) {
             JSONArray jsonArr = data.getJSONArray(clientId);
             ArrayList<JSONObject> arr = new ArrayList<>();
             for (int i=0; i<jsonArr.length(); i++) {
@@ -64,27 +102,6 @@ public class Storage {
             data.getJSONArray(clientId).clear();
             data.getJSONArray(clientId).putAll(arr);
         }
-        updateDbFile();
-    }
-
-    /**
-     * Remove the weather data submitted by the content server with the specified id.
-     * @param id The id of the content server.
-     */
-    public void removeWeatherData(String id) {
-        if (id!=null && data.has(id)) {
-            data.remove(id);
-            updateDbFile();
-            System.out.println("Delete content from " + id);
-        }
-    }
-
-    /**
-     * Remove all weather data.
-     */
-    public void removeAllData() {
-        data = new JSONObject();
-        updateDbFile();
     }
 
     /**
@@ -92,10 +109,12 @@ public class Storage {
      */
     private void updateDbFile() {
         try {
+            lock.acquire();
             FileWriter writer = new FileWriter(db);
             writer.write(data.toString());
             writer.flush();
             writer.close();
+            lock.release();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,6 +137,11 @@ public class Storage {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void replicate() {
+        Thread t = new Thread(new Replica(server, "src/main/java/server/replica.json"));
+        t.start();
     }
 
     public boolean isEmpty() { return data.isEmpty(); }

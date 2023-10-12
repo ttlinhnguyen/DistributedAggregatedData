@@ -7,6 +7,7 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class AggregationServer implements Runnable {
     private int port;
@@ -14,7 +15,9 @@ public class AggregationServer implements Runnable {
     private LamportClock clock;
     private ServerSocket server;
     private PriorityBlockingQueue<RequestNode> requestQueue;
+    private Semaphore fileLock;
     private Storage storage;
+//    private Replica replica;
 
     private Listener listener;
 
@@ -27,8 +30,8 @@ public class AggregationServer implements Runnable {
     public AggregationServer(int port) throws IOException {
         this.port = port;
         clock = new LamportClock();
+        fileLock = new Semaphore(1, true);
         requestQueue = new PriorityBlockingQueue<>(11, Comparator.comparingLong(RequestNode::getPriority));
-        storage = new Storage(this, "src/main/java/server/weather.json");
     }
 
     /**
@@ -36,6 +39,8 @@ public class AggregationServer implements Runnable {
      */
     public void run() {
         try {
+            storage = new Storage(this, "src/main/java/server/weather.json");
+//            replica = new Replica(this, "src/main/java/server/replica.json");
             server = new ServerSocket(port);
             startListener();
             while (running) {
@@ -79,8 +84,10 @@ public class AggregationServer implements Runnable {
     public Storage getStorage() { return storage; }
     public boolean isRunning() { return running; }
     public LamportClock getClock() { return clock; }
+    public Semaphore getFileLock() { return fileLock; }
+//    public Replica getReplica() { return replica; }
     public void stopListener() { listener.stop(); }
-    public void removeAllData() { storage.removeAllData(); }
+    public void removeAllData() throws InterruptedException { storage.removeAllData(); }
 
     /**
      * The command line arguments take one port number. If not provided, then the port
