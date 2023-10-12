@@ -2,11 +2,14 @@ package server.helpers;
 
 import clock.LamportClock;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import server.AggregationServer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -18,16 +21,20 @@ public class Storage {
     private JSONObject data;
     private LamportClock clock;
     private Semaphore lock;
-//    private Replica replica;
     private File db;
     public Storage(AggregationServer server, String path) {
         this.server = server;
         this.clock = server.getClock();
         this.lock = server.getFileLock();
-//        this.replica = server.getReplica();
 
         this.path = path;
         this.db = new File(this.path);
+        try {
+            db.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         updateLocalData();
     }
 
@@ -122,26 +129,52 @@ public class Storage {
 
     /**
      * Updates the local data from the data file.
+     * If the data file is faulty, retrieve it from the replica.
      */
     private void updateLocalData() {
         try {
-            db.createNewFile();
-            Scanner scanner = new Scanner(db);
-            String dbText = "";
-            if (scanner.hasNextLine()) {
-                dbText += scanner.nextLine();
-            }
-            scanner.close();
+            lock.acquire();
+            String dbText = readFile(db);
+            lock.release();
+
             if (dbText.isEmpty()) data = new JSONObject();
             else data = new JSONObject(dbText);
+        } catch (JSONException e) {
+            retrieveFromReplica();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void replicate() {
-        Thread t = new Thread(new Replica(server, "src/main/java/server/replica.json"));
+        Thread t = new Thread(new Replica(server, server.replicaPath));
         t.start();
+    }
+
+    private void retrieveFromReplica() {
+        try {
+            lock.acquire();
+            File replica = new File(server.replicaPath);
+            String dbText = readFile(replica);
+            lock.release();
+
+            if (dbText.isEmpty()) data = new JSONObject();
+            else data = new JSONObject(dbText);
+
+            updateDbFile();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String readFile(File file) throws FileNotFoundException {
+        Scanner scanner = new Scanner(file);
+        String res = "";
+        if (scanner.hasNextLine()) {
+            res += scanner.nextLine();
+        }
+        scanner.close();
+        return res;
     }
 
     public boolean isEmpty() { return data.isEmpty(); }

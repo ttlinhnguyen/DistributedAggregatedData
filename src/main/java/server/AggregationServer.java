@@ -17,7 +17,7 @@ public class AggregationServer implements Runnable {
     private PriorityBlockingQueue<RequestNode> requestQueue;
     private Semaphore fileLock;
     private Storage storage;
-//    private Replica replica;
+    public String replicaPath;
 
     private Listener listener;
 
@@ -32,6 +32,7 @@ public class AggregationServer implements Runnable {
         clock = new LamportClock();
         fileLock = new Semaphore(1, true);
         requestQueue = new PriorityBlockingQueue<>(11, Comparator.comparingLong(RequestNode::getPriority));
+        replicaPath = "src/main/java/server/replica.json";
     }
 
     /**
@@ -40,7 +41,6 @@ public class AggregationServer implements Runnable {
     public void run() {
         try {
             storage = new Storage(this, "src/main/java/server/weather.json");
-//            replica = new Replica(this, "src/main/java/server/replica.json");
             server = new ServerSocket(port);
             startListener();
             while (running) {

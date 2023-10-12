@@ -12,16 +12,20 @@ GET client retrieves JSON weather data from the aggregation server.
 
 ## Main Functionality
 * Seamless communication between the server and clients.
-* HTTP compliant messages between the server and clients with appropriate status code.
+* HTTP compliant messages between the server and clients with status code 200, 201, 204, 400, and 500.
 * Support for multiple simultaneous PUT and GET requests.
 * Removal of expired content after 30 seconds.
-* Retry to connect when the server is not available upon initial connection and request sending.
+* Clients retry to connect when the server is not available upon initial connection and request sending.
+* Server automatically keeps a replica which is used when the main data file is faulty.
 * Lamport Clock follows correct ascending logical time order.
 
 ## Aggregation Server
 The aggregation server upon running creates a `Listener` thread which listens to any stream/request
 coming in and the `ClientHandler` adds the request to the queue. While the server is active, `RequestHandler`
 pops the request from the queue and calls the appropriate method from `Storage` to get/put the weather data.
+### Fault Tolerance
+After each change in data, the server keeps a replica data `replica.json` which is used when
+the original data `weather.json` file is faulty.
 
 ## How to run manually
 ### Compile
