@@ -1,5 +1,5 @@
 CLASSPATH := \
-.:./lib/json-20230618.jar:./lib/hamcrest-core-1.3-javadoc.jar:./lib/junit-4.13.2-javadoc.jar:./target/classes:./target/test-classes
+.:./lib/json-20230618.jar:./target/classes:./target/test-classes
 
 TEST := src/test/java/*.java
 

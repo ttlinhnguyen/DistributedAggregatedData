@@ -23,6 +23,27 @@ The aggregation server upon running creates a `Listener` thread which listens to
 coming in and the `ClientHandler` adds the request to the queue. While the server is active, `RequestHandler`
 pops the request from the queue and calls the appropriate method from `Storage` to get/put the weather data.
 
+## How to run manually
+### Compile
+```
+make compile
+```
+### Run
+Replace `<class-path>` with `.:./lib/json-20230618.jar:./target/classes:./target/test-classes`,
+and other fields such as `<hostname>`, `<port>`, etc. with an appropriate value.
+
+Run the server first, then run content servers and GET clients in separate terminals.
+```
+# Run server
+java -cp <class-path> server.AggregationServer <port>
+
+# Run content server
+java -cp <class-path> client.content.ContentServer <hostname>:<port> <input-path>
+
+# Run GET client
+java -cp <class-path> client.getclient.GETClient <hostname>:<port>
+```
+
 ## Automated Testing
 ### Testing harness / Scenario Tests
 * Client manages to reconnect to the server
