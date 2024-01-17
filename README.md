@@ -1,4 +1,4 @@
-# Assignment 2 - Distributed Systems
+# Distributed Aggregated Data System
 ## Main Compositions
 ### Aggregation Server
 An aggregation server responsible for responding to requests and making
